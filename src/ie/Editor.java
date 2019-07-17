@@ -75,6 +75,12 @@ public class Editor {
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		
+		JMenuItem mntmUndo = new JMenuItem("Undo");
+		mnEdit.add(mntmUndo);
+		
+		JMenuItem mntmRedo = new JMenuItem("Redo");
+		mnEdit.add(mntmRedo);
+		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
 		
