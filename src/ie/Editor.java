@@ -17,6 +17,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
 
 public class Editor {
 
@@ -56,8 +60,22 @@ public class Editor {
 		frmImageeditor.getContentPane().setLayout(new BoxLayout(frmImageeditor.getContentPane(), BoxLayout.X_AXIS));
 		
 		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		frmImageeditor.getContentPane().add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
+		
+		JToolBar toolBar = new JToolBar();
+		panel.add(toolBar, BorderLayout.NORTH);
+		
+		JButton btnOpen = new JButton("Open");
+		btnOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		toolBar.add(btnOpen);
+		
+		JButton btnSave = new JButton("Save");
+		toolBar.add(btnSave);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmImageeditor.setJMenuBar(menuBar);
@@ -78,6 +96,11 @@ public class Editor {
 		mnNewMenu.add(mntmExport);
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+			}
+		});
 		mnNewMenu.add(mntmExit);
 		
 		JMenu mnEdit = new JMenu("Edit");
