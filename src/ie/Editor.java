@@ -7,10 +7,13 @@ import java.awt.Window.Type;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
@@ -21,6 +24,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Canvas;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.JDesktopPane;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JScrollPane;
+import javax.swing.JLabel;
 
 public class Editor {
 
@@ -67,15 +79,115 @@ public class Editor {
 		JToolBar toolBar = new JToolBar();
 		panel.add(toolBar, BorderLayout.NORTH);
 		
-		JButton btnOpen = new JButton("Open");
-		btnOpen.addActionListener(new ActionListener() {
+		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
+		JButton btnOpen = new JButton();
+		btnOpen.setIcon(new ImageIcon(openIcon));
+		toolBar.add(btnOpen);
+		
+		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
+		JButton btnSave = new JButton();
+		btnSave.setIcon(new ImageIcon(saveIcon));
+		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		toolBar.add(btnOpen);
-		
-		JButton btnSave = new JButton("Save");
 		toolBar.add(btnSave);
+		
+		Image undoIcon = new ImageIcon(this.getClass().getResource("/undo.png")).getImage();
+		
+		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
+		JButton btnUndo = new JButton();
+		btnUndo.setIcon(new ImageIcon(undoIcon));
+		btnUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JSeparator separator = new JSeparator();
+		separator.setMaximumSize(new Dimension(5, 20));
+		separator.setOrientation(SwingConstants.VERTICAL);
+		toolBar.add(separator);
+		
+		toolBar.add(btnUndo);
+		JButton btnRedo = new JButton();
+		btnRedo.setIcon(new ImageIcon(redoIcon));
+		toolBar.add(btnRedo);
+		
+		JPanel panelWork = new JPanel();
+		panel.add(panelWork, BorderLayout.CENTER);
+		GridBagLayout gbl_panelWork = new GridBagLayout();
+		gbl_panelWork.columnWidths = new int[]{0, 0, 0};
+		gbl_panelWork.rowHeights = new int[]{0, 0};
+		gbl_panelWork.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		gbl_panelWork.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		panelWork.setLayout(gbl_panelWork);
+		
+		JPanel panelTool = new JPanel();
+		GridBagConstraints gbc_panelTool = new GridBagConstraints();
+		gbc_panelTool.insets = new Insets(0, 0, 0, 5);
+		gbc_panelTool.anchor = GridBagConstraints.EAST;
+		gbc_panelTool.fill = GridBagConstraints.VERTICAL;
+		gbc_panelTool.gridx = 0;
+		gbc_panelTool.gridy = 0;
+		panelWork.add(panelTool, gbc_panelTool);
+		GridBagLayout gbl_panelTool = new GridBagLayout();
+		gbl_panelTool.columnWidths = new int[]{0, 0};
+		gbl_panelTool.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_panelTool.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_panelTool.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panelTool.setLayout(gbl_panelTool);
+		
+		JButton btnCrop = new JButton("Crop Image");
+		btnCrop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JLabel lblSpace = new JLabel("      ");
+		GridBagConstraints gbc_lblSpace = new GridBagConstraints();
+		gbc_lblSpace.insets = new Insets(0, 0, 5, 0);
+		gbc_lblSpace.gridx = 0;
+		gbc_lblSpace.gridy = 0;
+		panelTool.add(lblSpace, gbc_lblSpace);
+		GridBagConstraints gbc_btnCrop = new GridBagConstraints();
+		gbc_btnCrop.insets = new Insets(0, 0, 5, 0);
+		gbc_btnCrop.gridx = 0;
+		gbc_btnCrop.gridy = 1;
+		panelTool.add(btnCrop, gbc_btnCrop);
+		
+		JButton btnNewButton = new JButton("New button");
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton.gridx = 0;
+		gbc_btnNewButton.gridy = 2;
+		panelTool.add(btnNewButton, gbc_btnNewButton);
+		
+		JButton btnNewButton_2 = new JButton("New button");
+		GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
+		gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton_2.gridx = 0;
+		gbc_btnNewButton_2.gridy = 3;
+		panelTool.add(btnNewButton_2, gbc_btnNewButton_2);
+		
+		JButton btnNewButton_3 = new JButton("New button");
+		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
+		gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton_3.gridx = 0;
+		gbc_btnNewButton_3.gridy = 4;
+		panelTool.add(btnNewButton_3, gbc_btnNewButton_3);
+		
+		JButton btnNewButton_4 = new JButton("New button");
+		GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
+		gbc_btnNewButton_4.gridx = 0;
+		gbc_btnNewButton_4.gridy = 5;
+		panelTool.add(btnNewButton_4, gbc_btnNewButton_4);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 1;
+		gbc_scrollPane.gridy = 0;
+		panelWork.add(scrollPane, gbc_scrollPane);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmImageeditor.setJMenuBar(menuBar);
