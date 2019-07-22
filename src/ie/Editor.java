@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JCheckBoxMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -143,9 +144,9 @@ public class Editor implements ChangeListener{
 		//alignment
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
-		Panel panelUser = new Panel();
+		JPanel panelUser = new JPanel();
 		splitPane.setRightComponent(panelUser);
-		//panelUser.setLayout(new GridLayout(1, 1, 1, 1));
+		panelUser.setLayout(new BorderLayout());
 		
 		//Canvas canvas = new Canvas();
 		//panelUser.add(canvas);
@@ -159,34 +160,7 @@ public class Editor implements ChangeListener{
 		JButton btnOpen = new JButton();
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(lastOpenDir == null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if (selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						panelUser.add(new LoadImageApp(img));  
-						panelUser.repaint();
-						panelUser.revalidate();
-					}
-					
-				} else if (lastOpenDir != null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if(selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						panelUser.add(new LoadImageApp(img));  
-						panelUser.repaint();
-						panelUser.revalidate();
-					}
-				}
+				openImage(panelUser);
 			}
 		});
 		btnOpen.setIcon(new ImageIcon(openIcon));
@@ -197,6 +171,7 @@ public class Editor implements ChangeListener{
 		btnSave.setIcon(new ImageIcon(saveIcon));
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 			}
 		});
 		toolBar.add(btnSave);
@@ -233,35 +208,9 @@ public class Editor implements ChangeListener{
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(lastOpenDir == null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if (selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						panelUser.add(new LoadImageApp(img));  
-						panelUser.repaint();
-						panelUser.revalidate();
-					}
-					
-				} else if (lastOpenDir != null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if(selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						panelUser.add(new LoadImageApp(img));  
-						panelUser.repaint();
-						panelUser.revalidate();
-					}
-				}
-			}
+				openImage(panelUser);
+			}	
+				
 		});
 		mnNewMenu.add(mntmOpen);
 		
@@ -346,6 +295,43 @@ public class Editor implements ChangeListener{
 		mnHelp.add(mntmTutorials);
 	}
 
+	//method to open image
+	public void openImage(JPanel panelUser) {
+		//if(lastOpenDir == null) {
+			JFileChooser fc = new JFileChooser();
+			//set filter for images only
+			
+			int selFile = fc.showOpenDialog(null);
+			if (selFile == JFileChooser.APPROVE_OPTION) {
+				File img = fc.getSelectedFile();
+				lastOpenDir = img.getParent();
+				if (img.getName().endsWith(".png") || img.getName().endsWith(".jpg") || img.getName().endsWith(".raw")) {
+					//load image onto interface	
+					panelUser.add(new LoadImageApp(img),BorderLayout.CENTER);  
+					panelUser.repaint();
+					panelUser.revalidate();
+				} else {
+					JOptionPane.showMessageDialog(null, "Invalid type of image file", "Image File", JOptionPane.WARNING_MESSAGE);
+				}
+
+			//}
+			
+		/*} else if (lastOpenDir != null) {
+			JFileChooser fc = new JFileChooser();
+			//set filter for images only
+			int selFile = fc.showOpenDialog(null);
+			if(selFile == JFileChooser.APPROVE_OPTION) {
+				File img = fc.getSelectedFile();
+				lastOpenDir = img.getParent();
+				
+				//load image onto interface
+				panelUser.add(new LoadImageApp(img), BorderLayout.CENTER);  
+				panelUser.repaint();
+				panelUser.revalidate();
+			}*/
+		}
+	}
+	
 	//function to load image
 	public class LoadImageApp extends Component {
 		BufferedImage image;
@@ -369,7 +355,10 @@ public class Editor implements ChangeListener{
 				return new Dimension(image.getWidth(), image.getHeight());
 			}
 		}
+	
 	}
+	
+	
 	//// sub panels for each tab 
 	
 	public JPanel Crop() {
