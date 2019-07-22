@@ -165,7 +165,7 @@ public class Editor implements ChangeListener{
 		panel.add(splitPane, BorderLayout.CENTER);
 		
 		//toolbar starts off hidden - it shows up once you click on the divider
-		splitPane.setDividerLocation(0);
+		splitPane.setDividerLocation(0.2);
 		
 		// the tools at the side
 		
@@ -208,7 +208,7 @@ public class Editor implements ChangeListener{
 		
 		JPanel filt = new JPanel();
 		//layout?
-		filt.add(Blur());
+		filt.add(Filter());
 		filt.repaint();
 		filt.revalidate();
 		tabbedPane.add(filt, "Apply a filter");
