@@ -5,8 +5,11 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.Window.Type;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -24,10 +27,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Canvas;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
@@ -37,8 +44,12 @@ import java.awt.Insets;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Component;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import java.awt.FlowLayout;
 
-public class Editor {
+public class Editor implements ChangeListener{
 
 	private JFrame frmImageeditor;
 
@@ -82,6 +93,8 @@ public class Editor {
 		frmImageeditor.getContentPane().add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
+		
+		//Toolbar with icons
 		JToolBar toolBar = new JToolBar();
 		panel.add(toolBar, BorderLayout.NORTH);
 		
@@ -146,128 +159,66 @@ public class Editor {
 		btnRedo.setIcon(new ImageIcon(redoIcon));
 		toolBar.add(btnRedo);
 		
-		JPanel panelWork = new JPanel();
-		panel.add(panelWork, BorderLayout.CENTER);
-		GridBagLayout gbl_panelWork = new GridBagLayout();
-		gbl_panelWork.columnWidths = new int[]{0, 0, 0};
-		gbl_panelWork.rowHeights = new int[]{0, 0};
-		gbl_panelWork.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_panelWork.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		panelWork.setLayout(gbl_panelWork);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
-		gbc_scrollPane.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane.gridx = 0;
-		gbc_scrollPane.gridy = 0;
-		panelWork.add(scrollPane, gbc_scrollPane);
 		
-		JPanel panelTool = new JPanel();
-		panelTool.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		scrollPane.setViewportView(panelTool);
-		GridBagLayout gbl_panelTool = new GridBagLayout();
-		gbl_panelTool.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panelTool.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panelTool.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE, 0.0};
-		gbl_panelTool.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panelTool.setLayout(gbl_panelTool);
+		JSplitPane splitPane = new JSplitPane();
+		panel.add(splitPane, BorderLayout.CENTER);
 		
-		JLabel lblSpace = new JLabel("      ");
-		GridBagConstraints gbc_lblSpace = new GridBagConstraints();
-		gbc_lblSpace.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSpace.gridx = 2;
-		gbc_lblSpace.gridy = 0;
-		panelTool.add(lblSpace, gbc_lblSpace);
+		//toolbar starts off hidden - it shows up once you click on the divider
+		splitPane.setDividerLocation(0.2);
 		
-		JButton btnCrop = new JButton("Crop Image");
-		btnCrop.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		btnCrop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		// the tools at the side
 		
-		JLabel label = new JLabel("      ");
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.insets = new Insets(0, 0, 5, 5);
-		gbc_label.gridx = 2;
-		gbc_label.gridy = 1;
-		panelTool.add(label, gbc_label);
-		GridBagConstraints gbc_btnCrop = new GridBagConstraints();
-		gbc_btnCrop.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnCrop.gridwidth = 6;
-		gbc_btnCrop.insets = new Insets(0, 0, 5, 5);
-		gbc_btnCrop.gridx = 1;
-		gbc_btnCrop.gridy = 2;
-		panelTool.add(btnCrop, gbc_btnCrop);
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		splitPane.setLeftComponent(tabbedPane);
 		
-		JButton btnBrightness = new JButton("Edit Brightness");
-		btnBrightness.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		GridBagConstraints gbc_btnBrightness = new GridBagConstraints();
-		gbc_btnBrightness.gridwidth = 6;
-		gbc_btnBrightness.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnBrightness.insets = new Insets(0, 0, 5, 5);
-		gbc_btnBrightness.gridx = 1;
-		gbc_btnBrightness.gridy = 3;
-		panelTool.add(btnBrightness, gbc_btnBrightness);
+		JPanel ci = new JPanel();
+		ci.setLayout(new GridLayout(1,1));
+		ci.add(Crop());
+		ci.repaint();
+		ci.revalidate();
+		tabbedPane.add(ci, "Crop Image");
 		
-		JButton btnColour = new JButton("Edit Colour");
-		btnColour.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		GridBagConstraints gbc_btnColour = new GridBagConstraints();
-		gbc_btnColour.gridwidth = 6;
-		gbc_btnColour.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnColour.insets = new Insets(0, 0, 5, 5);
-		gbc_btnColour.gridx = 1;
-		gbc_btnColour.gridy = 4;
-		panelTool.add(btnColour, gbc_btnColour);
+		JPanel bi = new JPanel();
+		bi.setLayout(new GridLayout(1,1));
+		bi.add(Bright());
+		bi.repaint();
+		bi.revalidate();
+		tabbedPane.add(bi, "Edit Brightness");
 		
-		JButton btnText = new JButton("Add Text");
-		btnText.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		GridBagConstraints gbc_btnText = new GridBagConstraints();
-		gbc_btnText.insets = new Insets(0, 0, 5, 5);
-		gbc_btnText.gridwidth = 6;
-		gbc_btnText.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnText.gridx = 1;
-		gbc_btnText.gridy = 5;
-		panelTool.add(btnText, gbc_btnText);
+		JPanel col = new JPanel();
+		//layout??
+		col.add(Colour());
+		col.repaint();
+		col.revalidate();
+		tabbedPane.add(col, "Edit Colour");
 		
-		JButton btnBlur = new JButton("Blur Image");
-		btnBlur.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnBlur.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		GridBagConstraints gbc_btnBlur = new GridBagConstraints();
-		gbc_btnBlur.insets = new Insets(0, 0, 5, 5);
-		gbc_btnBlur.gridwidth = 6;
-		gbc_btnBlur.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnBlur.gridx = 1;
-		gbc_btnBlur.gridy = 6;
-		panelTool.add(btnBlur, gbc_btnBlur);
+		JPanel txt = new JPanel();
+		txt.add(Text());
+		txt.repaint();
+		txt.revalidate();
+		tabbedPane.add(txt, "Add Text");
 		
-		JButton btnFilters = new JButton("Apply filters");
-		btnFilters.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		GridBagConstraints gbc_btnFilters = new GridBagConstraints();
-		gbc_btnFilters.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnFilters.gridwidth = 6;
-		gbc_btnFilters.insets = new Insets(0, 0, 0, 5);
-		gbc_btnFilters.gridx = 1;
-		gbc_btnFilters.gridy = 7;
-		panelTool.add(btnFilters, gbc_btnFilters);
+		JPanel blur = new JPanel();
+		//layout?
+		blur.add(Blur());
+		blur.repaint();
+		blur.revalidate();
+		tabbedPane.add(blur, "Blur image");
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
-		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane_1.gridx = 1;
-		gbc_scrollPane_1.gridy = 0;
-		panelWork.add(scrollPane_1, gbc_scrollPane_1);
+		JPanel filt = new JPanel();
+		//layout?
+		filt.add(Filter());
+		filt.repaint();
+		filt.revalidate();
+		tabbedPane.add(filt, "Apply a filter");
+		//alignment
+		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
-		JPanel panelUser = new JPanel();
-		scrollPane_1.setViewportView(panelUser);
 		
-		Canvas canvas = new Canvas();
-		panelUser.add(canvas);
 		
+		// Top menu bar --- file menu etc
+	
 		JMenuBar menuBar = new JMenuBar();
 		frmImageeditor.setJMenuBar(menuBar);
 		
@@ -385,4 +336,99 @@ public class Editor {
 		mnHelp.add(mntmTutorials);
 	}
 
+	//// sub panels for each tab 
+	
+	public JPanel Crop() {
+		
+		JPanel cPanel = new JPanel();
+		cPanel.setLayout(new GridLayout(9,1));
+		
+		JRadioButton rect = new JRadioButton("Rectangular form");
+		cPanel.add(rect);
+		
+		JRadioButton free = new JRadioButton("Free form");
+		cPanel.add(free);
+		
+		cPanel.repaint();
+		cPanel.revalidate();
+		return cPanel;
+		
+	}
+	
+	public JPanel Bright() {
+		
+		JPanel bPanel = new JPanel();
+		bPanel.setLayout(new GridLayout(6,1));
+		
+		JLabel blabel = new JLabel("Brightness of Image", JLabel.CENTER);
+		bPanel.add(blabel);
+		
+		JSlider brightValue = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		
+		brightValue.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+			//figure out what to do with changelistener
+		
+		brightValue.setMajorTickSpacing(10);
+		brightValue.setMinorTickSpacing(1);
+		brightValue.setPaintTicks(true);
+		brightValue.setPaintLabels(true);
+		
+		bPanel.add(brightValue);
+		return bPanel;
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public JPanel Colour() {
+		
+		JPanel colPanel = new JPanel();
+		colPanel.setLayout(new GridLayout(4,1));
+		
+		JLabel col = new JLabel("Choose colour...");
+		colPanel.add(col);
+		
+		JLabel grad = new JLabel("Gradient...");
+		colPanel.add(grad);
+		
+		return colPanel;
+	}
+	
+	public JPanel Text() {
+		
+		JPanel tPanel = new JPanel();
+		tPanel.setLayout(new GridLayout(5,1));
+		
+		JLabel addt = new JLabel("Add text to image");
+		tPanel.add(addt);
+		
+		JTextField textToAdd = new JTextField(15);
+		tPanel.add(textToAdd);
+		
+		return tPanel;
+		
+	}
+	
+	public JPanel Blur() {
+		JPanel blPanel = new JPanel();
+		blPanel.setLayout(new GridLayout(5,1));
+		
+		JLabel what = new JLabel("what to do here");
+		blPanel.add(what);
+		
+		return blPanel;
+	}
+	
+	public JPanel Filter() {
+		JPanel fPanel = new JPanel();
+		fPanel.setLayout(new GridLayout(5,1));
+		
+		JLabel what = new JLabel("what to do here");
+		fPanel.add(what);
+		
+		return fPanel;
+	}
 }
