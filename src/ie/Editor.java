@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -41,6 +42,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
 import java.awt.Panel;
 
 public class Editor implements ChangeListener{
@@ -144,13 +146,11 @@ public class Editor implements ChangeListener{
 		//alignment
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
+		
 		JPanel panelUser = new JPanel();
-		splitPane.setRightComponent(panelUser);
-		panelUser.setLayout(new BorderLayout());
-		
-		//Canvas canvas = new Canvas();
-		//panelUser.add(canvas);
-		
+		panelUser.setLayout(new GridBagLayout());
+		JScrollPane pu = new JScrollPane(panelUser);
+		splitPane.setRightComponent(pu);
 		
 		//Toolbar with icons
 		JToolBar toolBar = new JToolBar();
@@ -305,9 +305,9 @@ public class Editor implements ChangeListener{
 			if (selFile == JFileChooser.APPROVE_OPTION) {
 				File img = fc.getSelectedFile();
 				lastOpenDir = img.getParent();
-				if (img.getName().endsWith(".png") || img.getName().endsWith(".jpg") || img.getName().endsWith(".raw")) {
+				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
 					//load image onto interface	
-					panelUser.add(new LoadImageApp(img),BorderLayout.CENTER);  
+					panelUser.add(new LoadImageApp(img));  
 					panelUser.repaint();
 					panelUser.revalidate();
 				} else {
