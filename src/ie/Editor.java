@@ -48,6 +48,8 @@ public class Editor implements ChangeListener{
 
 	private static String lastOpenDir = null;
 	
+	//do we need to make image panel static ??
+	
 	/**
 	 * Launch the application.
 	 */
