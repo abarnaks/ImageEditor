@@ -3,18 +3,14 @@ package ie;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import java.awt.Window.Type;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
@@ -24,30 +20,27 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Canvas;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Component;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Panel;
 
 public class Editor implements ChangeListener{
 
@@ -93,74 +86,6 @@ public class Editor implements ChangeListener{
 		frmImageeditor.getContentPane().add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
-		
-		//Toolbar with icons
-		JToolBar toolBar = new JToolBar();
-		panel.add(toolBar, BorderLayout.NORTH);
-		
-		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
-		JButton btnOpen = new JButton();
-		btnOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(lastOpenDir == null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if (selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-					}
-					
-				} else if (lastOpenDir != null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if(selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						
-					}
-				}
-			}
-		});
-		btnOpen.setIcon(new ImageIcon(openIcon));
-		toolBar.add(btnOpen);
-		
-		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
-		JButton btnSave = new JButton();
-		btnSave.setIcon(new ImageIcon(saveIcon));
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		toolBar.add(btnSave);
-		
-		Image undoIcon = new ImageIcon(this.getClass().getResource("/undo.png")).getImage();
-		
-		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
-		JButton btnUndo = new JButton();
-		btnUndo.setIcon(new ImageIcon(undoIcon));
-		btnUndo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JSeparator separator = new JSeparator();
-		separator.setMaximumSize(new Dimension(5, 20));
-		separator.setOrientation(SwingConstants.VERTICAL);
-		toolBar.add(separator);
-		
-		toolBar.add(btnUndo);
-		JButton btnRedo = new JButton();
-		btnRedo.setIcon(new ImageIcon(redoIcon));
-		toolBar.add(btnRedo);
-		
-		
-		
 		JSplitPane splitPane = new JSplitPane();
 		panel.add(splitPane, BorderLayout.CENTER);
 		
@@ -170,6 +95,7 @@ public class Editor implements ChangeListener{
 		// the tools at the side
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		
 		splitPane.setLeftComponent(tabbedPane);
 		
 		JPanel ci = new JPanel();
@@ -215,8 +141,85 @@ public class Editor implements ChangeListener{
 		//alignment
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
+		Panel panelUser = new Panel();
+		splitPane.setRightComponent(panelUser);
+		//panelUser.setLayout(new GridLayout(1, 1, 1, 1));
+		
+		//Canvas canvas = new Canvas();
+		//panelUser.add(canvas);
 		
 		
+		//Toolbar with icons
+		JToolBar toolBar = new JToolBar();
+		panel.add(toolBar, BorderLayout.NORTH);
+		
+		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
+		JButton btnOpen = new JButton();
+		btnOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(lastOpenDir == null) {
+					JFileChooser fc = new JFileChooser();
+					//set filter for images only
+					int selFile = fc.showOpenDialog(null);
+					if (selFile == JFileChooser.APPROVE_OPTION) {
+						File img = fc.getSelectedFile();
+						lastOpenDir = img.getParent();
+						
+						//load image onto interface
+						panelUser.add(new LoadImageApp(img));  
+						panelUser.repaint();
+						panelUser.revalidate();
+					}
+					
+				} else if (lastOpenDir != null) {
+					JFileChooser fc = new JFileChooser();
+					//set filter for images only
+					int selFile = fc.showOpenDialog(null);
+					if(selFile == JFileChooser.APPROVE_OPTION) {
+						File img = fc.getSelectedFile();
+						lastOpenDir = img.getParent();
+						
+						//load image onto interface
+						panelUser.add(new LoadImageApp(img));  
+						panelUser.repaint();
+						panelUser.revalidate();
+					}
+				}
+			}
+		});
+		btnOpen.setIcon(new ImageIcon(openIcon));
+		toolBar.add(btnOpen);
+		
+		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
+		JButton btnSave = new JButton();
+		btnSave.setIcon(new ImageIcon(saveIcon));
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		toolBar.add(btnSave);
+		
+		Image undoIcon = new ImageIcon(this.getClass().getResource("/undo.png")).getImage();
+		
+		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
+		JButton btnUndo = new JButton();
+		btnUndo.setIcon(new ImageIcon(undoIcon));
+		btnUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JSeparator separator = new JSeparator();
+		separator.setMaximumSize(new Dimension(5, 20));
+		separator.setOrientation(SwingConstants.VERTICAL);
+		toolBar.add(separator);
+		
+		toolBar.add(btnUndo);
+		JButton btnRedo = new JButton();
+		btnRedo.setIcon(new ImageIcon(redoIcon));
+		toolBar.add(btnRedo);
+		
+
 		// Top menu bar --- file menu etc
 	
 		JMenuBar menuBar = new JMenuBar();
@@ -237,6 +240,9 @@ public class Editor implements ChangeListener{
 						lastOpenDir = img.getParent();
 						
 						//load image onto interface
+						panelUser.add(new LoadImageApp(img));  
+						panelUser.repaint();
+						panelUser.revalidate();
 					}
 					
 				} else if (lastOpenDir != null) {
@@ -248,7 +254,9 @@ public class Editor implements ChangeListener{
 						lastOpenDir = img.getParent();
 						
 						//load image onto interface
-						
+						panelUser.add(new LoadImageApp(img));  
+						panelUser.repaint();
+						panelUser.revalidate();
 					}
 				}
 			}
@@ -336,6 +344,30 @@ public class Editor implements ChangeListener{
 		mnHelp.add(mntmTutorials);
 	}
 
+	//function to load image
+	public class LoadImageApp extends Component {
+		BufferedImage image;
+		
+		public void paint(Graphics g) {
+			g.drawImage(image, 0, 0, null);
+		}
+		
+		public LoadImageApp(File i) {
+			try {
+				image = ImageIO.read(i);
+			} catch (IOException e) {
+				
+			}
+		}
+		
+		public Dimension getPreferredSize() {
+			if (image == null) {
+				return new Dimension(100,100);
+			} else {
+				return new Dimension(image.getWidth(), image.getHeight());
+			}
+		}
+	}
 	//// sub panels for each tab 
 	
 	public JPanel Crop() {
