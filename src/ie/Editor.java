@@ -435,6 +435,8 @@ public class Editor implements ChangeListener{
 		
 	}
 	
+	//add panel for new text and font options
+	
 	public JPanel Blur() {
 		JPanel blPanel = new JPanel();
 		blPanel.setLayout(new GridLayout(5,1));
