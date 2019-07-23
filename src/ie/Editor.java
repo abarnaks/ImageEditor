@@ -1,5 +1,7 @@
 package ie;
 
+import java.awt.*;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -29,6 +31,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import ie.Brush;
+import ie.CustomUI;
+import ie.Model;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JSeparator;
@@ -45,13 +52,65 @@ import java.awt.Graphics;
 import java.awt.GridBagLayout;
 import java.awt.Panel;
 
-public class Editor implements ChangeListener{
+public class Editor implements ChangeListener, ActionListener {
 
 	private JFrame frmImageeditor;
-
+	
+	JPanel colorPlate;
+	
+	CustomUI customUI;
+	
+	int state;
+	final int BRUSH = 0;
+	
 	private static String lastOpenDir = null;
 	
+	Brush brush		= new Brush();
+	//Brush pencil	= new Brush();
+	//Brush eraser	= new Brush();
+	
+	JButton inkColor, canvasColor;
+	
+	JButton black, white, dGray, gray, lGray, green, blue, cyan,
+	magenta, orange, purple, red, yellow, brown;
+
+	public int getState()
+	{
+		return state;
+	}
+
+	public void setState(int state)
+	{
+		this.state = state;
+	}
+	
+	protected void updateInkColor(Color c){
+		brush.setColor(c);
+		//inkColor.setBkacground(c);
+		customUI.setBrushColor(c);
+	}
+	
+	
 	//do we need to make image panel static ??
+	
+	
+	private JButton colorButton(final Color c) {
+		JButton b = new JButton();		
+		b.addActionListener(new ActionListener()
+		{
+			
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				updateInkColor(c);
+				
+			}
+		});
+		Model.setComponentSize(b, 16, 16);
+		b.setBackground(c);
+		colorPlate.add(b);
+		return b;
+	}
+	
 	
 	/**
 	 * Launch the application.
@@ -413,6 +472,55 @@ public class Editor implements ChangeListener{
 		
 		JLabel col = new JLabel("Choose colour...");
 		colPanel.add(col);
+		//everything about color goes here
+		setState(BRUSH);
+		
+		inkColor = new JButton();//color of the ink being used
+		canvasColor = new JButton();//color of the canvas where the ink is placed
+		
+		//customUI = new CustomUI(BACKGOUND_COLOR, brush.getColor());
+		this.updateInkColor(Color.BLACK);
+		brush.setSize(8.0f);
+		
+		//this.updateCanvasColor(Color.WHITE);
+		//eraser.setSize(16.0f);
+		
+		colorPlate = new JPanel(new GridLayout(7, 2, 2, 2));
+		//colorPlate.setBackground(BACKGOUND_COLOR);
+		colorPlate.setBounds(8, 86, 64, 212);
+
+		//WILL NEED THIS TOO
+		inkColor.setBackground(brush.getColor());
+		inkColor.setBounds(8, 18, 64, 64);
+		inkColor.addActionListener(this);
+		Model.setComponentSize(inkColor, 64, 64);
+		
+		//inkColor.setUI(customUI);
+		
+		black	= colorButton(Color.BLACK);
+		brown	= colorButton(new Color(139,69,19));
+
+		dGray	= colorButton(Color.DARK_GRAY);
+		orange	= colorButton(Color.ORANGE);
+
+		gray	= colorButton(Color.GRAY);
+		yellow	= colorButton(Color.YELLOW);
+
+		lGray	= colorButton(Color.LIGHT_GRAY);
+		green	= colorButton(Color.GREEN);
+
+		white	= colorButton(Color.WHITE);
+		cyan	= colorButton(Color.CYAN);
+
+		magenta	= colorButton(Color.MAGENTA);
+		blue	= colorButton(Color.BLUE);
+
+		red		= colorButton(Color.RED);
+		purple	= colorButton(new Color(138,43,226));//Color.PINK);
+
+		
+		
+		//
 		
 		JLabel grad = new JLabel("Gradient...");
 		colPanel.add(grad);
@@ -454,4 +562,10 @@ public class Editor implements ChangeListener{
 		
 		return fPanel;
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}	
 }
