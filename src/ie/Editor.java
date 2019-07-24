@@ -22,6 +22,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JCheckBoxMenuItem;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -263,6 +265,7 @@ public class Editor implements ChangeListener{
 					panelUser.repaint();
 				} else {
 					//System.out.print("could not rotate");
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -275,16 +278,36 @@ public class Editor implements ChangeListener{
 					image = rotate90(image, "right");
 					panelUser.repaint();
 				} else {
-					System.out.print("could not rotate");
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 		mnTransform.add(mntmRotateRight);
 		
 		JMenuItem mntmFlipHorizontal = new JMenuItem("Flip horizontal");
+		mntmFlipHorizontal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(image != null) {
+					image = flipHorizontal(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmFlipHorizontal);
 		
 		JMenuItem mntmFlipVertical = new JMenuItem("Flip vertical");
+		mntmFlipVertical.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(image != null) {
+					image = flipVertical(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmFlipVertical);
 		
 		JMenu mnView = new JMenu("View");
@@ -336,28 +359,17 @@ public class Editor implements ChangeListener{
 				} else {
 					JOptionPane.showMessageDialog(null, "Invalid type of image file", "Image File", JOptionPane.WARNING_MESSAGE);
 				}
-
-			//}
-			
-		/*} else if (lastOpenDir != null) {
-			JFileChooser fc = new JFileChooser();
-			//set filter for images only
-			int selFile = fc.showOpenDialog(null);
-			if(selFile == JFileChooser.APPROVE_OPTION) {
-				File img = fc.getSelectedFile();
-				lastOpenDir = img.getParent();
-				
-				//load image onto interface
-				panelUser.add(new LoadImageApp(img), BorderLayout.CENTER);  
-				panelUser.repaint();
-				panelUser.revalidate();
-			}*/
 		}
 	}
 	
 	//function to load image
 	public class LoadImageApp extends Component {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public void paint(Graphics g) {
 			g.drawImage(image, 0, 0, null);
 		}
@@ -377,7 +389,6 @@ public class Editor implements ChangeListener{
 				return new Dimension(image.getWidth(), image.getHeight());
 			}
 		}
-	
 	}
 	
 	
@@ -504,4 +515,42 @@ public class Editor implements ChangeListener{
 	    graphics2D.drawRenderedImage(src, null);
 	    return image;
 	}
+	
+	//flip horizontally
+	public static BufferedImage flipHorizontal(BufferedImage src) {
+		int width = src.getWidth();
+	    int height = src.getHeight();
+	
+	    BufferedImage imageH = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D graphics2D = imageH.createGraphics();
+	    
+	    graphics2D.drawImage(src, 0, 0, null);
+	    graphics2D.dispose();
+	    
+	    AffineTransform hor = AffineTransform.getScaleInstance(1, -1);
+	    hor.translate(0, -src.getHeight());
+	    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+	    imageH = op.filter(imageH, null);
+	    
+	    return imageH;
+	}
+	
+	//flip vertically
+		public static BufferedImage flipVertical(BufferedImage src) {
+			int width = src.getWidth();
+		    int height = src.getHeight();
+		
+		    BufferedImage imageV = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+		    Graphics2D graphics2D = imageV.createGraphics();
+		    
+		    graphics2D.drawImage(src, 0, 0, null);
+		    graphics2D.dispose();
+		    
+		    AffineTransform hor = AffineTransform.getScaleInstance(-1, 1);
+		    hor.translate(-src.getWidth(), 0);
+		    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		    imageV = op.filter(imageV, null);
+		    
+		    return imageV;
+		}
 }
