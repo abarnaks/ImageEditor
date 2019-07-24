@@ -3,18 +3,15 @@ package ie;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import java.awt.Window.Type;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
@@ -22,38 +19,44 @@ import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JCheckBoxMenuItem;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Canvas;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Component;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Panel;
 
 public class Editor implements ChangeListener{
 
 	private JFrame frmImageeditor;
 
 	private static String lastOpenDir = null;
+	
+	private static BufferedImage image;
+
+	//do we need to make image panel static ??
 	
 	/**
 	 * Launch the application.
@@ -93,74 +96,6 @@ public class Editor implements ChangeListener{
 		frmImageeditor.getContentPane().add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
-		
-		//Toolbar with icons
-		JToolBar toolBar = new JToolBar();
-		panel.add(toolBar, BorderLayout.NORTH);
-		
-		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
-		JButton btnOpen = new JButton();
-		btnOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(lastOpenDir == null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if (selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-					}
-					
-				} else if (lastOpenDir != null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if(selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						
-					}
-				}
-			}
-		});
-		btnOpen.setIcon(new ImageIcon(openIcon));
-		toolBar.add(btnOpen);
-		
-		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
-		JButton btnSave = new JButton();
-		btnSave.setIcon(new ImageIcon(saveIcon));
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		toolBar.add(btnSave);
-		
-		Image undoIcon = new ImageIcon(this.getClass().getResource("/undo.png")).getImage();
-		
-		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
-		JButton btnUndo = new JButton();
-		btnUndo.setIcon(new ImageIcon(undoIcon));
-		btnUndo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JSeparator separator = new JSeparator();
-		separator.setMaximumSize(new Dimension(5, 20));
-		separator.setOrientation(SwingConstants.VERTICAL);
-		toolBar.add(separator);
-		
-		toolBar.add(btnUndo);
-		JButton btnRedo = new JButton();
-		btnRedo.setIcon(new ImageIcon(redoIcon));
-		toolBar.add(btnRedo);
-		
-		
-		
 		JSplitPane splitPane = new JSplitPane();
 		panel.add(splitPane, BorderLayout.CENTER);
 		
@@ -170,6 +105,7 @@ public class Editor implements ChangeListener{
 		// the tools at the side
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		
 		splitPane.setLeftComponent(tabbedPane);
 		
 		JPanel ci = new JPanel();
@@ -216,7 +152,56 @@ public class Editor implements ChangeListener{
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
 		
+		JPanel panelUser = new JPanel();
+		panelUser.setLayout(new GridBagLayout());
+		JScrollPane pu = new JScrollPane(panelUser);
+		splitPane.setRightComponent(pu);
 		
+		//Toolbar with icons
+		JToolBar toolBar = new JToolBar();
+		panel.add(toolBar, BorderLayout.NORTH);
+		
+		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
+		JButton btnOpen = new JButton();
+		btnOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openImage(panelUser);
+			}
+		});
+		btnOpen.setIcon(new ImageIcon(openIcon));
+		toolBar.add(btnOpen);
+		
+		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
+		JButton btnSave = new JButton();
+		btnSave.setIcon(new ImageIcon(saveIcon));
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		toolBar.add(btnSave);
+		
+		Image undoIcon = new ImageIcon(this.getClass().getResource("/undo.png")).getImage();
+		
+		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
+		JButton btnUndo = new JButton();
+		btnUndo.setIcon(new ImageIcon(undoIcon));
+		btnUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JSeparator separator = new JSeparator();
+		separator.setMaximumSize(new Dimension(5, 20));
+		separator.setOrientation(SwingConstants.VERTICAL);
+		toolBar.add(separator);
+		
+		toolBar.add(btnUndo);
+		JButton btnRedo = new JButton();
+		btnRedo.setIcon(new ImageIcon(redoIcon));
+		toolBar.add(btnRedo);
+		
+
 		// Top menu bar --- file menu etc
 	
 		JMenuBar menuBar = new JMenuBar();
@@ -228,30 +213,9 @@ public class Editor implements ChangeListener{
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(lastOpenDir == null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if (selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-					}
-					
-				} else if (lastOpenDir != null) {
-					JFileChooser fc = new JFileChooser();
-					//set filter for images only
-					int selFile = fc.showOpenDialog(null);
-					if(selFile == JFileChooser.APPROVE_OPTION) {
-						File img = fc.getSelectedFile();
-						lastOpenDir = img.getParent();
-						
-						//load image onto interface
-						
-					}
-				}
-			}
+				openImage(panelUser);
+			}	
+				
 		});
 		mnNewMenu.add(mntmOpen);
 		
@@ -294,15 +258,56 @@ public class Editor implements ChangeListener{
 		mnEdit.add(mnTransform);
 		
 		JMenuItem mntmRotateLeft = new JMenuItem("Rotate 90\u00B0 left");
+		mntmRotateLeft.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (image != null) {
+					image = rotate90(image, "left");
+					panelUser.repaint();
+				} else {
+					//System.out.print("could not rotate");
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmRotateLeft);
 		
 		JMenuItem mntmRotateRight = new JMenuItem("Rotate 90\u00B0 right");
+		mntmRotateRight.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (image != null) {
+					image = rotate90(image, "right");
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmRotateRight);
 		
 		JMenuItem mntmFlipHorizontal = new JMenuItem("Flip horizontal");
+		mntmFlipHorizontal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(image != null) {
+					image = flipHorizontal(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmFlipHorizontal);
 		
 		JMenuItem mntmFlipVertical = new JMenuItem("Flip vertical");
+		mntmFlipVertical.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(image != null) {
+					image = flipVertical(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnTransform.add(mntmFlipVertical);
 		
 		JMenu mnView = new JMenu("View");
@@ -336,6 +341,57 @@ public class Editor implements ChangeListener{
 		mnHelp.add(mntmTutorials);
 	}
 
+	//method to open image
+	public void openImage(JPanel panelUser) {
+		//if(lastOpenDir == null) {
+			JFileChooser fc = new JFileChooser();
+			//set filter for images only
+			
+			int selFile = fc.showOpenDialog(null);
+			if (selFile == JFileChooser.APPROVE_OPTION) {
+				File img = fc.getSelectedFile();
+				lastOpenDir = img.getParent();
+				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
+					//load image onto interface	
+					panelUser.add(new LoadImageApp(img));  
+					panelUser.repaint();
+					panelUser.revalidate();
+				} else {
+					JOptionPane.showMessageDialog(null, "Invalid type of image file", "Image File", JOptionPane.WARNING_MESSAGE);
+				}
+		}
+	}
+	
+	//function to load image
+	public class LoadImageApp extends Component {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public void paint(Graphics g) {
+			g.drawImage(image, 0, 0, null);
+		}
+		
+		public LoadImageApp(File i) {
+			try {
+				image = ImageIO.read(i);
+			} catch (IOException e) {
+				
+			}
+		}
+		
+		public Dimension getPreferredSize() {
+			if (image == null) {
+				return new Dimension(100,100);
+			} else {
+				return new Dimension(image.getWidth(), image.getHeight());
+			}
+		}
+	}
+	
+	
 	//// sub panels for each tab 
 	
 	public JPanel Crop() {
@@ -412,6 +468,8 @@ public class Editor implements ChangeListener{
 		
 	}
 	
+	//add panel for new text and font options
+	
 	public JPanel Blur() {
 		JPanel blPanel = new JPanel();
 		blPanel.setLayout(new GridLayout(5,1));
@@ -431,4 +489,68 @@ public class Editor implements ChangeListener{
 		
 		return fPanel;
 	}
+	
+	//menu bar functions
+	
+	//rotate 90 degrees
+	public static BufferedImage rotate90(BufferedImage src, String dir) {
+	    int width = src.getWidth();
+	    int height = src.getHeight();
+
+	    BufferedImage image = new BufferedImage(height, width, src.getType());
+	    Graphics2D graphics2D = image.createGraphics();
+	    
+	    if (dir == "right") {
+		    
+		    graphics2D.translate((height - width) / 2, (height - width) / 2);
+		    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
+		    
+		    
+	    } else if (dir == "left") {
+	    	
+	    	graphics2D.translate((width - height) / 2, (width - height) / 2);
+	        graphics2D.rotate(3*Math.PI/2, height / 2, width / 2);
+		    //graphics2D.drawRenderedImage(src, null);
+	    }
+	    graphics2D.drawRenderedImage(src, null);
+	    return image;
+	}
+	
+	//flip horizontally
+	public static BufferedImage flipHorizontal(BufferedImage src) {
+		int width = src.getWidth();
+	    int height = src.getHeight();
+	
+	    BufferedImage imageH = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D graphics2D = imageH.createGraphics();
+	    
+	    graphics2D.drawImage(src, 0, 0, null);
+	    graphics2D.dispose();
+	    
+	    AffineTransform hor = AffineTransform.getScaleInstance(1, -1);
+	    hor.translate(0, -src.getHeight());
+	    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+	    imageH = op.filter(imageH, null);
+	    
+	    return imageH;
+	}
+	
+	//flip vertically
+		public static BufferedImage flipVertical(BufferedImage src) {
+			int width = src.getWidth();
+		    int height = src.getHeight();
+		
+		    BufferedImage imageV = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+		    Graphics2D graphics2D = imageV.createGraphics();
+		    
+		    graphics2D.drawImage(src, 0, 0, null);
+		    graphics2D.dispose();
+		    
+		    AffineTransform hor = AffineTransform.getScaleInstance(-1, 1);
+		    hor.translate(-src.getWidth(), 0);
+		    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		    imageV = op.filter(imageV, null);
+		    
+		    return imageV;
+		}
 }
