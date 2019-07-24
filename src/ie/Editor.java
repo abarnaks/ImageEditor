@@ -548,7 +548,7 @@ public class Editor implements ChangeListener, ActionListener {
 		canvas.setLayout(new BorderLayout());
 		//canvas.setBounds(0, 0, 1024, 768);
 
-
+		//fix the panel
 		//canvasPanel = new JPanel();
 		//canvasPanel.setBackground(BACKGOUND_COLOR);
 		//canvasPanel.add(canvas);
