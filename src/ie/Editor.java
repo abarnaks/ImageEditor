@@ -42,6 +42,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
 import java.awt.Panel;
 
@@ -51,6 +52,8 @@ public class Editor implements ChangeListener{
 
 	private static String lastOpenDir = null;
 	
+	private static BufferedImage image;
+
 	//do we need to make image panel static ??
 	
 	/**
@@ -253,9 +256,29 @@ public class Editor implements ChangeListener{
 		mnEdit.add(mnTransform);
 		
 		JMenuItem mntmRotateLeft = new JMenuItem("Rotate 90\u00B0 left");
+		mntmRotateLeft.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (image != null) {
+					image = rotate90(image, "left");
+					panelUser.repaint();
+				} else {
+					//System.out.print("could not rotate");
+				}
+			}
+		});
 		mnTransform.add(mntmRotateLeft);
 		
 		JMenuItem mntmRotateRight = new JMenuItem("Rotate 90\u00B0 right");
+		mntmRotateRight.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (image != null) {
+					image = rotate90(image, "right");
+					panelUser.repaint();
+				} else {
+					System.out.print("could not rotate");
+				}
+			}
+		});
 		mnTransform.add(mntmRotateRight);
 		
 		JMenuItem mntmFlipHorizontal = new JMenuItem("Flip horizontal");
@@ -334,7 +357,6 @@ public class Editor implements ChangeListener{
 	
 	//function to load image
 	public class LoadImageApp extends Component {
-		BufferedImage image;
 		
 		public void paint(Graphics g) {
 			g.drawImage(image, 0, 0, null);
@@ -455,5 +477,31 @@ public class Editor implements ChangeListener{
 		fPanel.add(what);
 		
 		return fPanel;
+	}
+	
+	//menu bar functions
+	
+	//rotate 90 degrees
+	public static BufferedImage rotate90(BufferedImage src, String dir) {
+	    int width = src.getWidth();
+	    int height = src.getHeight();
+
+	    BufferedImage image = new BufferedImage(height, width, src.getType());
+	    Graphics2D graphics2D = image.createGraphics();
+	    
+	    if (dir == "right") {
+		    
+		    graphics2D.translate((height - width) / 2, (height - width) / 2);
+		    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
+		    
+		    
+	    } else if (dir == "left") {
+	    	
+	    	graphics2D.translate((width - height) / 2, (width - height) / 2);
+	        graphics2D.rotate(3*Math.PI/2, height / 2, width / 2);
+		    //graphics2D.drawRenderedImage(src, null);
+	    }
+	    graphics2D.drawRenderedImage(src, null);
+	    return image;
 	}
 }
