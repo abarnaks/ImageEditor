@@ -51,8 +51,6 @@ import java.awt.Panel;
 public class Editor implements ChangeListener{
 
 	private JFrame frmImageeditor;
-
-	private static String lastOpenDir = null;
 	
 	private static BufferedImage image;
 
@@ -120,20 +118,26 @@ public class Editor implements ChangeListener{
 		bi.add(Bright());
 		bi.repaint();
 		bi.revalidate();
-		tabbedPane.add(bi, "Edit Brightness");
+		tabbedPane.add(bi, "Edit Lighting");
 		
 		JPanel col = new JPanel();
 		//layout??
 		col.add(Colour());
 		col.repaint();
 		col.revalidate();
-		tabbedPane.add(col, "Edit Colour");
+		tabbedPane.add(col, "Add Colour");
 		
 		JPanel txt = new JPanel();
 		txt.add(Text());
 		txt.repaint();
 		txt.revalidate();
 		tabbedPane.add(txt, "Add Text");
+		
+		JPanel ori = new JPanel();
+		ori.add(Orient());
+		ori.repaint();
+		ori.revalidate();
+		tabbedPane.add(ori, "Edit Orientation");
 		
 		JPanel blur = new JPanel();
 		//layout?
@@ -350,7 +354,6 @@ public class Editor implements ChangeListener{
 			int selFile = fc.showOpenDialog(null);
 			if (selFile == JFileChooser.APPROVE_OPTION) {
 				File img = fc.getSelectedFile();
-				lastOpenDir = img.getParent();
 				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
 					//load image onto interface	
 					panelUser.add(new LoadImageApp(img));  
@@ -468,6 +471,44 @@ public class Editor implements ChangeListener{
 		
 	}
 	
+	//change orientation of image
+	public JPanel Orient() {
+		
+		JPanel oPanel = new JPanel();
+		oPanel.setLayout(new GridLayout(12,1));
+		
+		oPanel.add(new JLabel("\n\n"));
+		
+		Image left = new ImageIcon(this.getClass().getResource("/rotate_left.png")).getImage();
+		JButton rotClk = new JButton(" Rotate 90\u00B0 left");
+		rotClk.setIcon(new ImageIcon(left));
+		rotClk.setHorizontalAlignment(SwingConstants.LEFT);
+		oPanel.add(rotClk);
+		oPanel.add(new JLabel("\n\n"));
+		
+		Image right = new ImageIcon(this.getClass().getResource("/rotate_right.png")).getImage();
+		JButton rotCck = new JButton("Rotate 90\u00B0 right");
+		rotCck.setIcon(new ImageIcon(right));
+		rotCck.setHorizontalAlignment(SwingConstants.LEFT);
+		oPanel.add(rotCck);
+		oPanel.add(new JLabel("\n\n"));
+		
+		Image vert = new ImageIcon(this.getClass().getResource("/vertFlip.png")).getImage();
+		JButton flVert = new JButton("Flip Vertically");
+		flVert.setIcon(new ImageIcon(vert));
+		flVert.setHorizontalAlignment(SwingConstants.LEFT);
+		oPanel.add(flVert);
+		oPanel.add(new JLabel("\n\n"));
+		
+		Image hori = new ImageIcon(this.getClass().getResource("/horFlip.png")).getImage();
+		JButton flHor = new JButton("Flip Horizontally");
+		flHor.setIcon(new ImageIcon(hori));
+		flHor.setHorizontalAlignment(SwingConstants.LEFT);
+		oPanel.add(flHor);
+		oPanel.add(new JLabel("\n\n"));
+		
+		return oPanel;
+	}
 	//add panel for new text and font options
 	
 	public JPanel Blur() {
