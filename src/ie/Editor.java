@@ -39,8 +39,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import ie.Editor.ColorComboItem;
-
 import ie.Brush;
 import ie.CustomUI;
 import ie.Model;
@@ -62,7 +60,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
-import java.awt.Panel;
 import javax.swing.JComboBox;
 
 public class Editor implements ChangeListener, ActionListener {
@@ -420,13 +417,13 @@ public class Editor implements ChangeListener, ActionListener {
 
 	//method to open image
 	public void openImage(JPanel panelUser) {
-		//if(lastOpenDir == null) {
+		if(lastOpenDir == null) {
 			JFileChooser fc = new JFileChooser();
 			//set filter for images only
-			
 			int selFile = fc.showOpenDialog(null);
 			if (selFile == JFileChooser.APPROVE_OPTION) {
 				File img = fc.getSelectedFile();
+				lastOpenDir = img.getParent();
 				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
 					//load image onto interface	
 					panelUser.add(new LoadImageApp(img));  
@@ -435,6 +432,23 @@ public class Editor implements ChangeListener, ActionListener {
 				} else {
 					JOptionPane.showMessageDialog(null, "Invalid type of image file", "Image File", JOptionPane.WARNING_MESSAGE);
 				}
+			}	
+		} else if (lastOpenDir != null){
+			JFileChooser fc = new JFileChooser();
+			//set filter for images only
+			int selFile = fc.showOpenDialog(null);
+			if (selFile == JFileChooser.APPROVE_OPTION) {
+				File img = fc.getSelectedFile();
+				lastOpenDir = img.getParent();
+				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
+					//load image onto interface	
+					panelUser.add(new LoadImageApp(img));  
+					panelUser.repaint();
+					panelUser.revalidate();
+				} else {
+					JOptionPane.showMessageDialog(null, "Invalid type of image file", "Image File", JOptionPane.WARNING_MESSAGE);
+				}
+			}	
 		}
 	}
 	
@@ -465,6 +479,13 @@ public class Editor implements ChangeListener, ActionListener {
 				return new Dimension(image.getWidth(), image.getHeight());
 			}
 		}
+	}
+	
+	
+	//method to save image
+	public Image saveImage(JPanel panelUser) {
+		return null;
+		
 	}
 	
 	
@@ -564,12 +585,9 @@ public class Editor implements ChangeListener, ActionListener {
 	public JPanel Colour() {
 		
 		JPanel colPanel = new JPanel();
-		colPanel.setLayout(new GridLayout(4,1));
+		colPanel.setLayout(new GridLayout(12,1));
 		
-		JPanel newPanel = new JPanel();
-		JScrollPane pu = new JScrollPane(colPanel);
-		
-		JLabel col = new JLabel("Choose colour...");
+		JLabel col = new JLabel("Choose colour");
 		colPanel.add(col);
 		//everything about color goes here
 		setState(BRUSH);
@@ -584,16 +602,16 @@ public class Editor implements ChangeListener, ActionListener {
 		this.updateInkColor(Color.BLACK);
 		brush.setSize(8.0f);
 		
-		//this.updateCanvasColor(Color.WHITE);
+		this.updateCanvasColor(Color.WHITE);
 		//eraser.setSize(16.0f);
 		
 		colorPlate = new JPanel(new GridLayout(7, 2, 2, 2));
 		colorPlate.setBackground(BACKGOUND_COLOR);
-		//colorPlate.setBounds(8, 86, 64, 212);
+		colorPlate.setBounds(8, 86, 64, 212);
 
 		//WILL NEED THIS TOO
 		inkColor.setBackground(brush.getColor());
-		//inkColor.setBounds(8, 18, 64, 64);
+		inkColor.setBounds(8, 18, 64, 64);
 		inkColor.addActionListener(this);
 		Model.setComponentSize(inkColor, 64, 64);
 		
@@ -622,31 +640,29 @@ public class Editor implements ChangeListener, ActionListener {
 
 		
 		JPanel colorPanel = new JPanel();
-		colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
-		colorPanel.setBackground(BACKGOUND_COLOR);
+		//colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
+		//colorPanel.setBackground(BACKGOUND_COLOR);
 		colorPanel.add(inkColor);
 		colorPanel.add(colorPlate);		
-		Model.setComponentSize(colorPanel, 80, 304);
+		Model.setComponentSize(colorPanel, 80, 120);
 		
 		canvas.setLayout(new BorderLayout());
-		canvas.setBounds(0, 0, 1024, 768);
+		canvas.setBounds(0, 0, 102, 76);
 
 		//fix the panel
 		canvasPanel = new JPanel();
 		canvasPanel.setBackground(BACKGOUND_COLOR);
 		canvasPanel.add(canvas);
-		Model.setComponentSize(canvasPanel, 1024, 768);
+		Model.setComponentSize(canvasPanel, 102, 76);
 		
 		JPanel cp = new JPanel();
 		cp.add(canvasPanel);
 		
-		JLabel grad = new JLabel("Gradient...");
-		colPanel.add(grad);
+		
 		colPanel.add(colorPlate);
 		colPanel.add(cp);
-		newPanel.add(pu);
 		
-		return newPanel;
+		return colPanel;
 	}
 	
 	
