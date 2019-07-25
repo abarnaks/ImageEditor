@@ -1,5 +1,7 @@
 package ie;
 
+import java.awt.*;
+
 import java.awt.EventQueue;
 import java.awt.Font;
 
@@ -30,11 +32,19 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
+
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import ie.Editor.ColorComboItem;
+
+import ie.Brush;
+import ie.CustomUI;
+import ie.Model;
+import ie.DrawingAreaPanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -55,10 +65,23 @@ import java.awt.GridBagLayout;
 import java.awt.Panel;
 import javax.swing.JComboBox;
 
-public class Editor implements ChangeListener{
+public class Editor implements ChangeListener, ActionListener {
 
 	private JFrame frmImageeditor;
+
+	JPanel colorPlate;
 	
+	CustomUI customUI;
+	
+	int state;
+	final int BRUSH = 0;
+	
+	DrawingAreaPanel canvas;
+	
+	JPanel canvasPanel;
+	
+	private static String lastOpenDir = null;
+
 	private static BufferedImage image;
 	
 	private static JPanel panelUser = new JPanel();
@@ -68,8 +91,28 @@ public class Editor implements ChangeListener{
 	private static int numSize; //font size
 	private static String[] fonts;
 	
+	final Color	 BACKGOUND_COLOR = new Color(212, 212, 212);//Color.BLACK;
+	
+	Brush brush		= new Brush();
+	//Brush pencil	= new Brush();
+	//Brush eraser	= new Brush();
+	
+	JButton inkColor, canvasColor;
+	
+	JButton black, white, dGray, gray, lGray, green, blue, cyan,
+	magenta, orange, purple, red, yellow, brown;
 
+	public int getState()
+	{
+		return state;
+	}
+
+	public void setState(int state)
+	{
+		this.state = state;
+	}	
 	//do we need to make image panel static ??
+	
 	
 	/**
 	 * Launch the application.
@@ -425,8 +468,7 @@ public class Editor implements ChangeListener{
 	}
 	
 	
-	//// sub panels for each tab 
-	
+	//// sub panels for each tab 	
 	public JPanel Crop() {
 		
 		JPanel cPanel = new JPanel();
@@ -489,18 +531,120 @@ public class Editor implements ChangeListener{
 		
 	}
 	
+	//major issue
+	protected void updateInkColor(Color c){
+		brush.setColor(c);
+		//inkColor.setBkacground(c);
+		customUI.setBrushColor(c);
+	}
+	
+	protected void updateCanvasColor(Color c)
+	{
+	//	eraser.setColor(c);
+		canvasColor.setBackground(c);
+	}
+	
+	private JButton colorButton(final Color c) {
+		JButton b = new JButton();		
+		b.addActionListener(new ActionListener()
+		{
+			
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				updateInkColor(c);
+				
+			}
+		});
+		Model.setComponentSize(b, 16, 16);
+		b.setBackground(c);
+		colorPlate.add(b);
+		return b;
+	}
+	
 	public JPanel Colour() {
 		
 		JPanel colPanel = new JPanel();
 		colPanel.setLayout(new GridLayout(4,1));
 		
+		JPanel newPanel = new JPanel();
+		JScrollPane pu = new JScrollPane(colPanel);
+		
 		JLabel col = new JLabel("Choose colour...");
 		colPanel.add(col);
+		//everything about color goes here
+		setState(BRUSH);
+		
+		canvas	 = new DrawingAreaPanel();
+		
+		inkColor = new JButton();//color of the ink being used
+		canvasColor = new JButton();//color of the canvas where the ink is placed
+		
+		customUI = new CustomUI(BACKGOUND_COLOR, brush.getColor());
+		//
+		this.updateInkColor(Color.BLACK);
+		brush.setSize(8.0f);
+		
+		//this.updateCanvasColor(Color.WHITE);
+		//eraser.setSize(16.0f);
+		
+		colorPlate = new JPanel(new GridLayout(7, 2, 2, 2));
+		colorPlate.setBackground(BACKGOUND_COLOR);
+		//colorPlate.setBounds(8, 86, 64, 212);
+
+		//WILL NEED THIS TOO
+		inkColor.setBackground(brush.getColor());
+		//inkColor.setBounds(8, 18, 64, 64);
+		inkColor.addActionListener(this);
+		Model.setComponentSize(inkColor, 64, 64);
+		
+		//inkColor.setUI(customUI);
+		
+		black	= colorButton(Color.BLACK);
+		brown	= colorButton(new Color(139,69,19));
+
+		dGray	= colorButton(Color.DARK_GRAY);
+		orange	= colorButton(Color.ORANGE);
+
+		gray	= colorButton(Color.GRAY);
+		yellow	= colorButton(Color.YELLOW);
+
+		lGray	= colorButton(Color.LIGHT_GRAY);
+		green	= colorButton(Color.GREEN);
+
+		white	= colorButton(Color.WHITE);
+		cyan	= colorButton(Color.CYAN);
+
+		magenta	= colorButton(Color.MAGENTA);
+		blue	= colorButton(Color.BLUE);
+
+		red		= colorButton(Color.RED);
+		purple	= colorButton(new Color(138,43,226));//Color.PINK);
+
+		
+		JPanel colorPanel = new JPanel();
+		colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
+		colorPanel.setBackground(BACKGOUND_COLOR);
+		colorPanel.add(inkColor);
+		colorPanel.add(colorPlate);		
+		Model.setComponentSize(colorPanel, 80, 304);
+		
+		canvas.setLayout(new BorderLayout());
+		//canvas.setBounds(0, 0, 1024, 768);
+
+		//fix the panel
+		//canvasPanel = new JPanel();
+		//canvasPanel.setBackground(BACKGOUND_COLOR);
+		//canvasPanel.add(canvas);
+		//Model.setComponentSize(canvasPanel, 1024, 768);
+		//
 		
 		JLabel grad = new JLabel("Gradient...");
 		colPanel.add(grad);
+		colPanel.add(colorPlate);
+		colPanel.add(canvasPanel);
+		newPanel.add(pu);
 		
-		return colPanel;
+		return newPanel;
 	}
 	
 	
@@ -691,6 +835,7 @@ public class Editor implements ChangeListener{
 		
 		return fPanel;
 	}
+
 	
 	//menu bar functions
 	
@@ -753,4 +898,11 @@ public class Editor implements ChangeListener{
 	    
 	    return imageV;
 	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}	
+
 }
