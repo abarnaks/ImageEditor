@@ -1,6 +1,7 @@
 package ie;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -31,6 +33,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import ie.Editor.ColorComboItem;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JSeparator;
@@ -45,14 +50,24 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Panel;
+import javax.swing.JComboBox;
 
 public class Editor implements ChangeListener{
 
 	private JFrame frmImageeditor;
 	
 	private static BufferedImage image;
+	
+	private static JPanel panelUser = new JPanel();
+	
+	private static Font f;
+	private static int style; //Font style -- bold, italic, etc
+	private static int numSize; //font size
+	private static String[] fonts;
+	
 
 	//do we need to make image panel static ??
 	
@@ -103,8 +118,8 @@ public class Editor implements ChangeListener{
 		// the tools at the side
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		
-		splitPane.setLeftComponent(tabbedPane);
+		JScrollPane tp = new JScrollPane(tabbedPane);
+		splitPane.setLeftComponent(tp);
 		
 		JPanel ci = new JPanel();
 		ci.setLayout(new GridLayout(1,1));
@@ -156,7 +171,7 @@ public class Editor implements ChangeListener{
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		
 		
-		JPanel panelUser = new JPanel();
+		
 		panelUser.setLayout(new GridBagLayout());
 		JScrollPane pu = new JScrollPane(panelUser);
 		splitPane.setRightComponent(pu);
@@ -417,9 +432,9 @@ public class Editor implements ChangeListener{
 	public JPanel Bright() {
 		
 		JPanel bPanel = new JPanel();
-		bPanel.setLayout(new GridLayout(6,1));
+		bPanel.setLayout(new GridLayout(10,1));
 		
-		JLabel blabel = new JLabel("Brightness of Image", JLabel.CENTER);
+		JLabel blabel = new JLabel("Brightness", JLabel.CENTER);
 		bPanel.add(blabel);
 		
 		JSlider brightValue = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
@@ -433,6 +448,23 @@ public class Editor implements ChangeListener{
 		brightValue.setPaintLabels(true);
 		
 		bPanel.add(brightValue);
+		bPanel.add(new JLabel("\n\n"));
+		
+		JLabel clabel = new JLabel("Contrast", JLabel.CENTER);
+		bPanel.add(clabel);
+		
+		JSlider contrast = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		
+		contrast.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+			//figure out what to do with changelistener
+		
+		contrast.setMajorTickSpacing(10);
+		contrast.setMinorTickSpacing(1);
+		contrast.setPaintTicks(true);
+		contrast.setPaintLabels(true);
+		
+		bPanel.add(contrast);
+		
 		return bPanel;
 	}
 
@@ -456,10 +488,11 @@ public class Editor implements ChangeListener{
 		return colPanel;
 	}
 	
+	
 	public JPanel Text() {
 		
 		JPanel tPanel = new JPanel();
-		tPanel.setLayout(new GridLayout(5,1));
+		tPanel.setLayout(new GridLayout(25,1));
 		
 		JLabel addt = new JLabel("Add text to image");
 		tPanel.add(addt);
@@ -467,9 +500,123 @@ public class Editor implements ChangeListener{
 		JTextField textToAdd = new JTextField(15);
 		tPanel.add(textToAdd);
 		
+		tPanel.add(new JLabel("\n"));
+		
+		JLabel addn = new JLabel("Enter text size");
+		tPanel.add(addn);
+		
+		JTextField size = new JTextField(3);
+		tPanel.add(size);
+		
+		tPanel.add(new JLabel("\n"));
+		
+		JLabel selF = new JLabel("Select Font");
+		tPanel.add(selF);
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		fonts = ge.getAvailableFontFamilyNames();
+		JComboBox<Object> fcombo = new JComboBox<Object>(fonts);
+		tPanel.add(fcombo);
+		
+		//tPanel.add(new JLabel("\n"));
+		
+		JPanel s = new JPanel();
+		
+		JCheckBox bold = new JCheckBox("Bold");
+		s.add(bold);
+		
+		s.add(new JLabel("\t\t\t\t"));
+		
+		JCheckBox italic = new JCheckBox("Italic");
+		s.add(italic);
+		
+		tPanel.add(s);
+		
+		tPanel.add(new JLabel("\n"));
+		
+		JLabel selCol = new JLabel("Select Colour");
+		tPanel.add(selCol);
+		
+		JComboBox<Object> colours = new JComboBox<Object>();
+		colours.addItem(new ColorComboItem("Black", Color.BLACK));
+		colours.addItem(new ColorComboItem("White", Color.WHITE));
+		colours.addItem(new ColorComboItem("Blue", Color.BLUE));
+		colours.addItem(new ColorComboItem("Cyan", Color.CYAN));
+		colours.addItem(new ColorComboItem("Green", Color.GREEN));
+		colours.addItem(new ColorComboItem("Magenta", Color.MAGENTA));
+		colours.addItem(new ColorComboItem("Orange", Color.ORANGE));
+		
+		tPanel.add(colours);
+		
+		tPanel.add(new JLabel("\n"));
+		
+		JLabel selPos = new JLabel("Select Position");
+		tPanel.add(selPos);
+		
+		//need to implement the positions
+		String[] position = {"Top", "Top Left", "Top Right", "Bottom", "Bottom Left", "Bottom Right", "Center", "Left", "Right"}; 
+		JComboBox<Object> comboBox = new JComboBox<Object>(position);
+		tPanel.add(comboBox);
+		
+		JButton add = new JButton("Add Text to Image");
+		add.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (bold.isSelected()) {
+					style = Font.BOLD;
+				} else if (italic.isSelected()) {
+					style = Font.ITALIC;
+				} else if (bold.isSelected() && italic.isSelected()) {
+					style = Font.BOLD | Font.ITALIC;
+				} else {
+					style = Font.PLAIN;
+				}
+
+				numSize = Integer.parseInt(size.getText());
+				
+				f = new Font(fcombo.getSelectedItem().toString(), style, numSize);
+				
+				if (image != null) {
+					Graphics2D gg = image.createGraphics();
+					Object item = colours.getSelectedItem();
+					gg.setColor(((ColorComboItem) item).getValue());
+					gg.setFont(f);
+					gg.drawString(textToAdd.getText(), 40, 50);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed. Please open an image to edit.", "Image", JOptionPane.WARNING_MESSAGE);
+				}	
+			}
+		});
+		tPanel.add(new JLabel("\n\n"));
+		tPanel.add(add);
+
 		return tPanel;
 		
 	}
+	
+	public class ColorComboItem {
+	    private String key;
+	    private Color value;
+
+	    public ColorComboItem(String key, Color value) {
+	        this.key = key;
+	        this.value = value;
+	    }
+
+	    @Override
+	    public String toString() {
+	        return key;
+	    }
+
+	    public String getKey() {
+	        return key;
+	    }
+
+	    public Color getValue() {
+	        return value;
+	    }
+	}
+	
 	
 	//change orientation of image
 	public JPanel Orient() {
@@ -509,7 +656,6 @@ public class Editor implements ChangeListener{
 		
 		return oPanel;
 	}
-	//add panel for new text and font options
 	
 	public JPanel Blur() {
 		JPanel blPanel = new JPanel();
