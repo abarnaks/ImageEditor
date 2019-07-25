@@ -118,6 +118,7 @@ public class Editor implements ChangeListener{
 		// the tools at the side
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setFont(new Font("Serif", Font.BOLD, 16));
 		JScrollPane tp = new JScrollPane(tabbedPane);
 		splitPane.setLeftComponent(tp);
 		
@@ -182,6 +183,7 @@ public class Editor implements ChangeListener{
 		
 		Image openIcon = new ImageIcon(this.getClass().getResource("/open.PNG")).getImage();
 		JButton btnOpen = new JButton();
+		btnOpen.setToolTipText("Open Image");
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				openImage(panelUser);
@@ -192,6 +194,7 @@ public class Editor implements ChangeListener{
 		
 		Image saveIcon = new ImageIcon(this.getClass().getResource("/save.PNG")).getImage();
 		JButton btnSave = new JButton();
+		btnSave.setToolTipText("Save Image");
 		btnSave.setIcon(new ImageIcon(saveIcon));
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -204,6 +207,7 @@ public class Editor implements ChangeListener{
 		
 		Image redoIcon = new ImageIcon(this.getClass().getResource("/redo.png")).getImage();
 		JButton btnUndo = new JButton();
+		btnUndo.setToolTipText("Undo last edit");
 		btnUndo.setIcon(new ImageIcon(undoIcon));
 		btnUndo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -217,8 +221,19 @@ public class Editor implements ChangeListener{
 		
 		toolBar.add(btnUndo);
 		JButton btnRedo = new JButton();
+		btnRedo.setToolTipText("Redo last edit");
 		btnRedo.setIcon(new ImageIcon(redoIcon));
 		toolBar.add(btnRedo);
+		
+		Image refreshIcon = new ImageIcon(this.getClass().getResource("/refresh.png")).getImage();
+		JButton btnRefresh = new JButton();
+		btnRefresh.setToolTipText("Refresh screen");
+		btnRefresh.setIcon(new ImageIcon(refreshIcon));
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		toolBar.add(btnRefresh);
 		
 
 		// Top menu bar --- file menu etc
@@ -622,7 +637,7 @@ public class Editor implements ChangeListener{
 	public JPanel Orient() {
 		
 		JPanel oPanel = new JPanel();
-		oPanel.setLayout(new GridLayout(12,1));
+		oPanel.setLayout(new GridLayout(10,1));
 		
 		oPanel.add(new JLabel("\n\n"));
 		
@@ -691,13 +706,11 @@ public class Editor implements ChangeListener{
 		    
 		    graphics2D.translate((height - width) / 2, (height - width) / 2);
 		    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
-		    
-		    
+		       
 	    } else if (dir == "left") {
 	    	
 	    	graphics2D.translate((width - height) / 2, (width - height) / 2);
 	        graphics2D.rotate(3*Math.PI/2, height / 2, width / 2);
-		    //graphics2D.drawRenderedImage(src, null);
 	    }
 	    graphics2D.drawRenderedImage(src, null);
 	    return image;
@@ -723,21 +736,21 @@ public class Editor implements ChangeListener{
 	}
 	
 	//flip vertically
-		public static BufferedImage flipVertical(BufferedImage src) {
-			int width = src.getWidth();
-		    int height = src.getHeight();
-		
-		    BufferedImage imageV = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
-		    Graphics2D graphics2D = imageV.createGraphics();
-		    
-		    graphics2D.drawImage(src, 0, 0, null);
-		    graphics2D.dispose();
-		    
-		    AffineTransform hor = AffineTransform.getScaleInstance(-1, 1);
-		    hor.translate(-src.getWidth(), 0);
-		    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		    imageV = op.filter(imageV, null);
-		    
-		    return imageV;
-		}
+	public static BufferedImage flipVertical(BufferedImage src) {
+		int width = src.getWidth();
+	    int height = src.getHeight();
+	
+	    BufferedImage imageV = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D graphics2D = imageV.createGraphics();
+	    
+	    graphics2D.drawImage(src, 0, 0, null);
+	    graphics2D.dispose();
+	    
+	    AffineTransform hor = AffineTransform.getScaleInstance(-1, 1);
+	    hor.translate(-src.getWidth(), 0);
+	    AffineTransformOp op = new AffineTransformOp(hor, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+	    imageV = op.filter(imageV, null);
+	    
+	    return imageV;
+	}
 }
