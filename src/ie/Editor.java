@@ -78,6 +78,7 @@ public class Editor implements ChangeListener, ActionListener {
 	JPanel canvasPanel;
 	
 	private static String lastOpenDir = null;
+	private static String lastSaveDir = null;
 
 	private static BufferedImage image;
 	
@@ -238,7 +239,7 @@ public class Editor implements ChangeListener, ActionListener {
 		btnSave.setIcon(new ImageIcon(saveIcon));
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				saveImage(panelUser);
 			}
 		});
 		toolBar.add(btnSave);
@@ -426,6 +427,9 @@ public class Editor implements ChangeListener, ActionListener {
 				lastOpenDir = img.getParent();
 				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
 					//load image onto interface	
+					if (image != null) {	//removes existing image if there is one
+						panelUser.removeAll();
+					}
 					panelUser.add(new LoadImageApp(img));  
 					panelUser.repaint();
 					panelUser.revalidate();
@@ -441,7 +445,10 @@ public class Editor implements ChangeListener, ActionListener {
 				File img = fc.getSelectedFile();
 				lastOpenDir = img.getParent();
 				if (img.getName().endsWith(".png") || img.getName().endsWith(".PNG") || img.getName().endsWith(".jpg") || img.getName().endsWith(".JPG")|| img.getName().endsWith(".raw")) {
-					//load image onto interface	
+					//load image onto interface
+					if (image != null) {	//removes existing image if there is one
+						panelUser.removeAll();
+					}
 					panelUser.add(new LoadImageApp(img));  
 					panelUser.repaint();
 					panelUser.revalidate();
@@ -466,6 +473,7 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		public LoadImageApp(File i) {
 			try {
+				
 				image = ImageIO.read(i);
 			} catch (IOException e) {
 				
@@ -483,8 +491,46 @@ public class Editor implements ChangeListener, ActionListener {
 	
 	
 	//method to save image
-	public Image saveImage(JPanel panelUser) {
-		return null;
+	public File saveImage(JPanel panelUser) {
+		JFrame winSave = new JFrame();
+		
+		if(lastSaveDir != null) {
+			JFileChooser saveFile = new JFileChooser(lastSaveDir);
+			saveFile.setDialogTitle("Save Image");
+			int userSel = saveFile.showSaveDialog(winSave);
+			
+			if (userSel == JFileChooser.APPROVE_OPTION) {
+				File fts = saveFile.getSelectedFile();
+				lastSaveDir = fts.getParent();
+				try {
+					ImageIO.write(image, "png", fts);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return fts;
+			} else {
+				return null;
+			}
+		} else {
+			JFileChooser saveFile = new JFileChooser(lastSaveDir);
+			saveFile.setDialogTitle("Save Image");
+			int userSel = saveFile.showSaveDialog(winSave);
+			
+			if (userSel == JFileChooser.APPROVE_OPTION) {
+				File fts = saveFile.getSelectedFile();
+				lastSaveDir = fts.getParent();
+				try {
+					ImageIO.write(image, "png", fts);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return fts;
+			} else {
+				return null;
+			}
+		}
 		
 	}
 	
@@ -659,7 +705,7 @@ public class Editor implements ChangeListener, ActionListener {
 		cp.add(canvasPanel);
 		
 		
-		colPanel.add(colorPlate);
+		//colPanel.add(colorPlate);
 		colPanel.add(cp);
 		
 		return colPanel;
@@ -747,9 +793,12 @@ public class Editor implements ChangeListener, ActionListener {
 				} else {
 					style = Font.PLAIN;
 				}
+				if (size.getText() != null) {
+					numSize = Integer.parseInt(size.getText());
+				} else {
+					JOptionPane.showMessageDialog(null, "Please enter a font size", "Image", JOptionPane.WARNING_MESSAGE);
 
-				numSize = Integer.parseInt(size.getText());
-				
+				}
 				f = new Font(fcombo.getSelectedItem().toString(), style, numSize);
 				
 				if (image != null) {
