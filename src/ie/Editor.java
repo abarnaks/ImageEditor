@@ -629,19 +629,21 @@ public class Editor implements ChangeListener, ActionListener {
 		Model.setComponentSize(colorPanel, 80, 304);
 		
 		canvas.setLayout(new BorderLayout());
-		//canvas.setBounds(0, 0, 1024, 768);
+		canvas.setBounds(0, 0, 1024, 768);
 
 		//fix the panel
-		//canvasPanel = new JPanel();
-		//canvasPanel.setBackground(BACKGOUND_COLOR);
-		//canvasPanel.add(canvas);
-		//Model.setComponentSize(canvasPanel, 1024, 768);
-		//
+		canvasPanel = new JPanel();
+		canvasPanel.setBackground(BACKGOUND_COLOR);
+		canvasPanel.add(canvas);
+		Model.setComponentSize(canvasPanel, 1024, 768);
+		
+		JPanel cp = new JPanel();
+		cp.add(canvasPanel);
 		
 		JLabel grad = new JLabel("Gradient...");
 		colPanel.add(grad);
 		colPanel.add(colorPlate);
-		colPanel.add(canvasPanel);
+		colPanel.add(cp);
 		newPanel.add(pu);
 		
 		return newPanel;
