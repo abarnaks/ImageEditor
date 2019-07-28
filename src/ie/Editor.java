@@ -15,6 +15,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
@@ -159,9 +160,21 @@ public class Editor implements ChangeListener, ActionListener {
 		// the tools at the side
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setFont(new Font("Serif", Font.BOLD, 16));
+		tabbedPane.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		JScrollPane tp = new JScrollPane(tabbedPane);
 		splitPane.setLeftComponent(tp);
+		
+		JPanel txt = new JPanel();
+		txt.add(Text());
+		txt.repaint();
+		txt.revalidate();
+		tabbedPane.add(txt, "Add Text");
+		
+		JPanel ori = new JPanel();
+		ori.add(Orient());
+		ori.repaint();
+		ori.revalidate();
+		tabbedPane.add(ori, "Edit Orientation");
 		
 		JPanel ci = new JPanel();
 		ci.setLayout(new GridLayout(1,1));
@@ -183,18 +196,6 @@ public class Editor implements ChangeListener, ActionListener {
 		col.repaint();
 		col.revalidate();
 		tabbedPane.add(col, "Add Colour");
-		
-		JPanel txt = new JPanel();
-		txt.add(Text());
-		txt.repaint();
-		txt.revalidate();
-		tabbedPane.add(txt, "Add Text");
-		
-		JPanel ori = new JPanel();
-		ori.add(Orient());
-		ori.repaint();
-		ori.revalidate();
-		tabbedPane.add(ori, "Edit Orientation");
 		
 		JPanel blur = new JPanel();
 		//layout?
@@ -275,6 +276,17 @@ public class Editor implements ChangeListener, ActionListener {
 			}
 		});
 		toolBar.add(btnRefresh);
+		
+		Image selectIcon = new ImageIcon(this.getClass().getResource("/select.png")).getImage();
+		JButton btnSelect = new JButton("Select");
+		btnSelect.setIcon(new ImageIcon(selectIcon));
+		btnSelect.setToolTipText("Select area");
+		btnSelect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		toolBar.add(btnSelect);
+		
 		
 
 		// Top menu bar --- file menu etc
@@ -705,6 +717,7 @@ public class Editor implements ChangeListener, ActionListener {
 		cp.add(canvasPanel);
 		
 		
+		//uncomment to run
 		//colPanel.add(colorPlate);
 		colPanel.add(cp);
 		
@@ -715,31 +728,42 @@ public class Editor implements ChangeListener, ActionListener {
 	public JPanel Text() {
 		
 		JPanel tPanel = new JPanel();
-		tPanel.setLayout(new GridLayout(25,1));
+		tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.Y_AXIS));
 		
-		JLabel addt = new JLabel("Add text to image");
-		tPanel.add(addt);
+		JPanel a = new JPanel();
+		JLabel addt = new JLabel("Text");
+		a.add(addt);
 		
 		JTextField textToAdd = new JTextField(15);
-		tPanel.add(textToAdd);
+		a.add(textToAdd);
 		
-		tPanel.add(new JLabel("\n"));
+		tPanel.add(a);
+	//	tPanel.add(new JLabel("\n"));
 		
+		JPanel tex = new JPanel();
+		tex.setLayout(new GridLayout(4,2,2,2));
+		TitledBorder title;
+		title = BorderFactory.createTitledBorder("Font Style");
+		tex.setBorder(title);
+		
+		JPanel ts = new JPanel();
 		JLabel addn = new JLabel("Enter text size");
-		tPanel.add(addn);
+		ts.add(addn);
 		
 		JTextField size = new JTextField(3);
-		tPanel.add(size);
+		ts.add(size);
 		
-		tPanel.add(new JLabel("\n"));
+		tex.add(ts);
+		
+	//	tPanel.add(new JLabel("\n"));
 		
 		JLabel selF = new JLabel("Select Font");
-		tPanel.add(selF);
+		tex.add(selF);
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		fonts = ge.getAvailableFontFamilyNames();
 		JComboBox<Object> fcombo = new JComboBox<Object>(fonts);
-		tPanel.add(fcombo);
+		tex.add(fcombo);
 		
 		//tPanel.add(new JLabel("\n"));
 		
@@ -748,17 +772,25 @@ public class Editor implements ChangeListener, ActionListener {
 		JCheckBox bold = new JCheckBox("Bold");
 		s.add(bold);
 		
-		s.add(new JLabel("\t\t\t\t"));
+	//	s.add(new JLabel("\t\t\t\t"));
 		
 		JCheckBox italic = new JCheckBox("Italic");
 		s.add(italic);
 		
-		tPanel.add(s);
+		tex.add(s);
 		
-		tPanel.add(new JLabel("\n"));
+		tPanel.add(tex);
+		
+//		tPanel.add(new JLabel("\n"));
+		
+		JPanel ex = new JPanel();
+		ex.setLayout(new GridLayout(2,1, 5, 5));
+		TitledBorder topic;
+		topic = BorderFactory.createTitledBorder("Colour and Position");
+		ex.setBorder(topic);
 		
 		JLabel selCol = new JLabel("Select Colour");
-		tPanel.add(selCol);
+		ex.add(selCol);
 		
 		JComboBox<Object> colours = new JComboBox<Object>();
 		colours.addItem(new ColorComboItem("Black", Color.BLACK));
@@ -769,19 +801,24 @@ public class Editor implements ChangeListener, ActionListener {
 		colours.addItem(new ColorComboItem("Magenta", Color.MAGENTA));
 		colours.addItem(new ColorComboItem("Orange", Color.ORANGE));
 		
-		tPanel.add(colours);
+		ex.add(colours);
 		
-		tPanel.add(new JLabel("\n"));
+//		tPanel.add(new JLabel("\n"));
 		
 		JLabel selPos = new JLabel("Select Position");
-		tPanel.add(selPos);
+		ex.add(selPos);
 		
 		//need to implement the positions
 		String[] position = {"Top", "Top Left", "Top Right", "Bottom", "Bottom Left", "Bottom Right", "Center", "Left", "Right"}; 
 		JComboBox<Object> comboBox = new JComboBox<Object>(position);
-		tPanel.add(comboBox);
+		ex.add(comboBox);
+		
+		tPanel.add(ex);
+		
+		JPanel t = new JPanel();
 		
 		JButton add = new JButton("Add Text to Image");
+		
 		add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (bold.isSelected()) {
@@ -793,12 +830,13 @@ public class Editor implements ChangeListener, ActionListener {
 				} else {
 					style = Font.PLAIN;
 				}
-				if (size.getText() != null) {
-					numSize = Integer.parseInt(size.getText());
-				} else {
+				
+				if (size.getText() == null) {
 					JOptionPane.showMessageDialog(null, "Please enter a font size", "Image", JOptionPane.WARNING_MESSAGE);
-
+				} else {
+					numSize = Integer.parseInt(size.getText());
 				}
+				
 				f = new Font(fcombo.getSelectedItem().toString(), style, numSize);
 				
 				if (image != null) {
@@ -813,8 +851,8 @@ public class Editor implements ChangeListener, ActionListener {
 				}	
 			}
 		});
-		tPanel.add(new JLabel("\n\n"));
-		tPanel.add(add);
+		t.add(add);
+		tPanel.add(t);
 
 		return tPanel;
 		
@@ -848,37 +886,89 @@ public class Editor implements ChangeListener, ActionListener {
 	public JPanel Orient() {
 		
 		JPanel oPanel = new JPanel();
-		oPanel.setLayout(new GridLayout(10,1));
+		oPanel.setLayout(new GridLayout(3,1, 2, 3));
 		
-		oPanel.add(new JLabel("\n\n"));
+		JPanel rot = new JPanel();
+		rot.setLayout(new GridLayout(2,1, 5, 5));
+		TitledBorder title;
+		title = BorderFactory.createTitledBorder("Rotate");
+		rot.setBorder(title);
 		
 		Image left = new ImageIcon(this.getClass().getResource("/rotate_left.png")).getImage();
-		JButton rotClk = new JButton(" Rotate 90\u00B0 left");
+		JButton rotClk = new JButton(" 90\u00B0 left");
+		rotClk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (image != null) {
+					image = rotate90(image, "left");
+					panelUser.repaint();
+				} else {
+					//System.out.print("could not rotate");
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		rotClk.setIcon(new ImageIcon(left));
 		rotClk.setHorizontalAlignment(SwingConstants.LEFT);
-		oPanel.add(rotClk);
-		oPanel.add(new JLabel("\n\n"));
+		rot.add(rotClk);
 		
 		Image right = new ImageIcon(this.getClass().getResource("/rotate_right.png")).getImage();
-		JButton rotCck = new JButton("Rotate 90\u00B0 right");
+		JButton rotCck = new JButton(" 90\u00B0 right");
+		rotCck.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (image != null) {
+					image = rotate90(image, "right");
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		rotCck.setIcon(new ImageIcon(right));
 		rotCck.setHorizontalAlignment(SwingConstants.LEFT);
-		oPanel.add(rotCck);
-		oPanel.add(new JLabel("\n\n"));
+		rot.add(rotCck);
+		
+		oPanel.add(rot);
+		//oPanel.add(new JLabel(" "));
+		
+		JPanel flip = new JPanel();
+		flip.setLayout(new GridLayout(2,1, 5, 5));
+		TitledBorder topic;
+		topic = BorderFactory.createTitledBorder("Flip");
+		flip.setBorder(topic);
 		
 		Image vert = new ImageIcon(this.getClass().getResource("/vertFlip.png")).getImage();
-		JButton flVert = new JButton("Flip Vertically");
+		JButton flVert = new JButton(" Vertically");
+		flVert.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(image != null) {
+					image = flipVertical(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		flVert.setIcon(new ImageIcon(vert));
 		flVert.setHorizontalAlignment(SwingConstants.LEFT);
-		oPanel.add(flVert);
-		oPanel.add(new JLabel("\n\n"));
+		flip.add(flVert);
 		
 		Image hori = new ImageIcon(this.getClass().getResource("/horFlip.png")).getImage();
-		JButton flHor = new JButton("Flip Horizontally");
+		JButton flHor = new JButton(" Horizontally");
+		flHor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(image != null) {
+					image = flipHorizontal(image);
+					panelUser.repaint();
+				} else {
+					JOptionPane.showMessageDialog(null, "Action could not be completed.", "Action", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		flHor.setIcon(new ImageIcon(hori));
 		flHor.setHorizontalAlignment(SwingConstants.LEFT);
-		oPanel.add(flHor);
-		oPanel.add(new JLabel("\n\n"));
+		flip.add(flHor);
+		
+		oPanel.add(flip);
 		
 		return oPanel;
 	}
