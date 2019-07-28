@@ -65,7 +65,11 @@ public class Editor implements ChangeListener, ActionListener {
 	CustomUI customUI;
 	
 	int state;
+	
 	final int BRUSH = 0;
+	final int LINE = 1;
+	final int PENCIL = 2;
+	final int ERASER = 3;
 	
 	DrawingAreaPanel canvas;
 	
