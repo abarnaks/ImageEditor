@@ -558,6 +558,7 @@ public class Editor implements ChangeListener, ActionListener {
 		JLabel grad = new JLabel("Gradient...");
 		colPanel.add(grad);
 		colPanel.add(colorPlate);
+		
 		colPanel.add(canvasPanel);
 		newPanel.add(pu);
 		
