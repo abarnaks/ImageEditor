@@ -16,6 +16,7 @@ import java.awt.Image;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
@@ -267,6 +268,7 @@ public class Editor implements ChangeListener, ActionListener {
 		btnRedo.setIcon(new ImageIcon(redoIcon));
 		toolBar.add(btnRedo);
 		
+		
 		Image refreshIcon = new ImageIcon(this.getClass().getResource("/refresh.png")).getImage();
 		JButton btnRefresh = new JButton();
 		btnRefresh.setToolTipText("Refresh screen");
@@ -276,6 +278,11 @@ public class Editor implements ChangeListener, ActionListener {
 			}
 		});
 		toolBar.add(btnRefresh);
+		
+		JSeparator separator1 = new JSeparator();
+		separator1.setMaximumSize(new Dimension(5, 20));
+		separator1.setOrientation(SwingConstants.VERTICAL);
+		toolBar.add(separator1);
 		
 		Image selectIcon = new ImageIcon(this.getClass().getResource("/select.png")).getImage();
 		JButton btnSelect = new JButton("Select");
@@ -552,8 +559,9 @@ public class Editor implements ChangeListener, ActionListener {
 		//draw rectangle
 		
 		JPanel cPanel = new JPanel();
-		cPanel.setLayout(new GridLayout(9,1));
+		cPanel.setLayout(new BoxLayout(cPanel, BoxLayout.Y_AXIS));
 		
+		cPanel.add(Box.createRigidArea(new Dimension(0,5)));
 		JRadioButton rect = new JRadioButton("Rectangular form");
 		cPanel.add(rect);
 		
@@ -569,10 +577,16 @@ public class Editor implements ChangeListener, ActionListener {
 	public JPanel Bright() {
 		
 		JPanel bPanel = new JPanel();
-		bPanel.setLayout(new GridLayout(10,1));
+		bPanel.setLayout(new BoxLayout(bPanel, BoxLayout.Y_AXIS));
 		
-		JLabel blabel = new JLabel("Brightness", JLabel.CENTER);
-		bPanel.add(blabel);
+		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
+		
+		//brightness
+		JPanel b = new JPanel();
+		b.setLayout(new BoxLayout(b, BoxLayout.Y_AXIS));
+		TitledBorder title;
+		title = BorderFactory.createTitledBorder("Brightness");
+		b.setBorder(title);
 		
 		JSlider brightValue = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 		
@@ -584,11 +598,17 @@ public class Editor implements ChangeListener, ActionListener {
 		brightValue.setPaintTicks(true);
 		brightValue.setPaintLabels(true);
 		
-		bPanel.add(brightValue);
-		bPanel.add(new JLabel("\n\n"));
+		b.add(brightValue);
+		bPanel.add(b);
+	
+		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
 		
-		JLabel clabel = new JLabel("Contrast", JLabel.CENTER);
-		bPanel.add(clabel);
+		//contrast
+		JPanel c = new JPanel();
+		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+		TitledBorder title1;
+		title1 = BorderFactory.createTitledBorder("Contrast");
+		c.setBorder(title1);
 		
 		JSlider contrast = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 		
@@ -600,7 +620,74 @@ public class Editor implements ChangeListener, ActionListener {
 		contrast.setPaintTicks(true);
 		contrast.setPaintLabels(true);
 		
-		bPanel.add(contrast);
+		c.add(contrast);
+		bPanel.add(c);
+		
+		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
+		
+		//exposure
+		JPanel e = new JPanel();
+		e.setLayout(new BoxLayout(e, BoxLayout.Y_AXIS));
+		TitledBorder title3;
+		title3 = BorderFactory.createTitledBorder("Exposure");
+		e.setBorder(title3);
+		
+		JSlider exposure = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		
+		exposure.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+			//figure out what to do with changelistener
+		
+		exposure.setMajorTickSpacing(10);
+		exposure.setMinorTickSpacing(1);
+		exposure.setPaintTicks(true);
+		exposure.setPaintLabels(true);
+		
+		e.add(exposure);
+		bPanel.add(e);
+			
+		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
+		
+		//shadows
+		JPanel s = new JPanel();
+		s.setLayout(new BoxLayout(s, BoxLayout.Y_AXIS));
+		TitledBorder title2;
+		title2 = BorderFactory.createTitledBorder("Shadows");
+		s.setBorder(title2);
+		
+		JSlider shadows = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		
+		shadows.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+			//figure out what to do with changelistener
+		
+		shadows.setMajorTickSpacing(10);
+		shadows.setMinorTickSpacing(1);
+		shadows.setPaintTicks(true);
+		shadows.setPaintLabels(true);
+		
+		s.add(shadows);
+		bPanel.add(s);
+		
+		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
+		
+		//highlight
+		JPanel h = new JPanel();
+		h.setLayout(new BoxLayout(h, BoxLayout.Y_AXIS));
+		TitledBorder title4;
+		title4 = BorderFactory.createTitledBorder("Highlight");
+		h.setBorder(title4);
+		
+		JSlider highlight = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		
+		highlight.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+			//figure out what to do with changelistener
+		
+		highlight.setMajorTickSpacing(10);
+		highlight.setMinorTickSpacing(1);
+		highlight.setPaintTicks(true);
+		highlight.setPaintLabels(true);
+		
+		h.add(highlight);
+		bPanel.add(h);
 		
 		return bPanel;
 	}
@@ -699,7 +786,7 @@ public class Editor implements ChangeListener, ActionListener {
 
 		
 		JPanel colorPanel = new JPanel();
-		//colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
+		colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
 		//colorPanel.setBackground(BACKGOUND_COLOR);
 		colorPanel.add(inkColor);
 		colorPanel.add(colorPlate);		
@@ -719,7 +806,7 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		
 		//uncomment to run
-		//colPanel.add(colorPlate);
+		colPanel.add(colorPlate);
 		colPanel.add(cp);
 		
 		return colPanel;
@@ -731,49 +818,48 @@ public class Editor implements ChangeListener, ActionListener {
 		JPanel tPanel = new JPanel();
 		tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.Y_AXIS));
 		
+		tPanel.add(Box.createRigidArea(new Dimension(0,5)));
+		
 		JPanel a = new JPanel();
-		JLabel addt = new JLabel("Text");
-		a.add(addt);
+		//a.setLayout(new GridLayout(4,2,2,2));
+		TitledBorder textTitle;
+		textTitle = BorderFactory.createTitledBorder("Text");
+		a.setBorder(textTitle);
 		
 		JTextField textToAdd = new JTextField(15);
 		a.add(textToAdd);
 		
 		tPanel.add(a);
-	//	tPanel.add(new JLabel("\n"));
+		
+		tPanel.add(Box.createRigidArea(new Dimension(0,5)));
 		
 		JPanel tex = new JPanel();
-		tex.setLayout(new GridLayout(4,2,2,2));
+		tex.setLayout(new GridLayout(4,1,2,2));
 		TitledBorder title;
 		title = BorderFactory.createTitledBorder("Font Style");
 		tex.setBorder(title);
-		
+
 		JPanel ts = new JPanel();
 		JLabel addn = new JLabel("Enter text size");
 		ts.add(addn);
-		
+
 		JTextField size = new JTextField(3);
 		ts.add(size);
 		
 		tex.add(ts);
 		
-	//	tPanel.add(new JLabel("\n"));
-		
-		JLabel selF = new JLabel("Select Font");
-		tex.add(selF);
-		
+		tex.add(Box.createRigidArea(new Dimension(0,1)));
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		fonts = ge.getAvailableFontFamilyNames();
 		JComboBox<Object> fcombo = new JComboBox<Object>(fonts);
 		tex.add(fcombo);
-		
-		//tPanel.add(new JLabel("\n"));
-		
+
 		JPanel s = new JPanel();
 		
 		JCheckBox bold = new JCheckBox("Bold");
 		s.add(bold);
 		
-	//	s.add(new JLabel("\t\t\t\t"));
+		s.add(Box.createRigidArea(new Dimension(10,0)));
 		
 		JCheckBox italic = new JCheckBox("Italic");
 		s.add(italic);
@@ -803,8 +889,6 @@ public class Editor implements ChangeListener, ActionListener {
 		colours.addItem(new ColorComboItem("Orange", Color.ORANGE));
 		
 		ex.add(colours);
-		
-//		tPanel.add(new JLabel("\n"));
 		
 		JLabel selPos = new JLabel("Select Position");
 		ex.add(selPos);
@@ -887,10 +971,10 @@ public class Editor implements ChangeListener, ActionListener {
 	public JPanel Orient() {
 		
 		JPanel oPanel = new JPanel();
-		oPanel.setLayout(new GridLayout(3,1, 2, 3));
+		oPanel.setLayout(new BoxLayout(oPanel, BoxLayout.Y_AXIS));
 		
 		JPanel rot = new JPanel();
-		rot.setLayout(new GridLayout(2,1, 5, 5));
+		rot.setLayout(new GridLayout(2,1));
 		TitledBorder title;
 		title = BorderFactory.createTitledBorder("Rotate");
 		rot.setBorder(title);
@@ -932,7 +1016,7 @@ public class Editor implements ChangeListener, ActionListener {
 		//oPanel.add(new JLabel(" "));
 		
 		JPanel flip = new JPanel();
-		flip.setLayout(new GridLayout(2,1, 5, 5));
+		flip.setLayout(new GridLayout(2,1));
 		TitledBorder topic;
 		topic = BorderFactory.createTitledBorder("Flip");
 		flip.setBorder(topic);
@@ -1056,11 +1140,11 @@ public class Editor implements ChangeListener, ActionListener {
 	    
 	    return imageV;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		
-	}	
+	}
 
 }
