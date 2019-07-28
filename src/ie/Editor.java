@@ -84,6 +84,7 @@ public class Editor implements ChangeListener, ActionListener {
 
 	private static BufferedImage image;
 	
+	//panelUser is currently a JPanel
 	private static JPanel panelUser = new JPanel();
 	
 	private static Font f;
