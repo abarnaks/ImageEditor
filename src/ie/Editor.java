@@ -549,6 +549,7 @@ public class Editor implements ChangeListener, ActionListener {
 	
 	//// sub panels for each tab 	
 	public JPanel Crop() {
+		//draw rectangle
 		
 		JPanel cPanel = new JPanel();
 		cPanel.setLayout(new GridLayout(9,1));
