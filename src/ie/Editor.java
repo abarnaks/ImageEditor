@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
@@ -157,7 +158,7 @@ public class Editor implements ChangeListener, ActionListener {
 		panel.add(splitPane, BorderLayout.CENTER);
 		
 		//toolbar starts off hidden - it shows up once you click on the divider
-		splitPane.setDividerLocation(0.2);
+	//	splitPane.setDividerLocation(0.2);
 		
 		// the tools at the side
 		
@@ -178,43 +179,41 @@ public class Editor implements ChangeListener, ActionListener {
 		ori.revalidate();
 		tabbedPane.add(ori, "Edit Orientation");
 		
-		JPanel ci = new JPanel();
-		ci.setLayout(new GridLayout(1,1));
-		ci.add(Crop());
-		ci.repaint();
-		ci.revalidate();
-		tabbedPane.add(ci, "Crop Image");
-		
 		JPanel bi = new JPanel();
-		bi.setLayout(new GridLayout(1,1));
 		bi.add(Bright());
 		bi.repaint();
 		bi.revalidate();
 		tabbedPane.add(bi, "Edit Lighting");
 		
+		JPanel ci = new JPanel();
+		ci.add(Crop());
+		ci.repaint();
+		ci.revalidate();
+		tabbedPane.add(ci, "Crop Image");
+		//tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
+		
 		JPanel col = new JPanel();
-		//layout??
 		col.add(Colour());
 		col.repaint();
 		col.revalidate();
 		tabbedPane.add(col, "Add Colour");
+		//tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
 		
-		JPanel blur = new JPanel();
-		//layout?
+		/*JPanel blur = new JPanel();
 		blur.add(Blur());
 		blur.repaint();
 		blur.revalidate();
 		tabbedPane.add(blur, "Blur image");
+		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);*/
 		
 		JPanel filt = new JPanel();
-		//layout?
 		filt.add(Filter());
 		filt.repaint();
 		filt.revalidate();
 		tabbedPane.add(filt, "Apply a filter");
 		//alignment
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
-		
+		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
 		
 		
 		panelUser.setLayout(new GridBagLayout());
@@ -561,6 +560,10 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		JPanel cPanel = new JPanel();
 		cPanel.setLayout(new BoxLayout(cPanel, BoxLayout.Y_AXIS));
+		cPanel.setLayout(new BoxLayout(cPanel, BoxLayout.Y_AXIS));
+		TitledBorder title;
+		title = BorderFactory.createTitledBorder("Cropping style");
+		cPanel.setBorder(title);
 		
 		cPanel.add(Box.createRigidArea(new Dimension(0,5)));
 		JRadioButton rect = new JRadioButton("Rectangular form");
@@ -589,17 +592,30 @@ public class Editor implements ChangeListener, ActionListener {
 		title = BorderFactory.createTitledBorder("Brightness");
 		b.setBorder(title);
 		
-		JSlider brightValue = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+		JSlider brightness = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 		
-		brightValue.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+		brightness.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				float value = (float) brightness.getValue();
+				float scaleFactor = 2 * value / brightness.getMaximum();
+				RescaleOp op = new RescaleOp(scaleFactor,0,null);
+				image = op.filter(image, null);
+				panelUser.repaint();
+				
+			}
+			
+		});	//use this event to edit the picture
 			//figure out what to do with changelistener
 		
-		brightValue.setMajorTickSpacing(10);
-		brightValue.setMinorTickSpacing(1);
-		brightValue.setPaintTicks(true);
-		brightValue.setPaintLabels(true);
+		brightness.setMajorTickSpacing(10);
+		brightness.setMinorTickSpacing(1);
+		brightness.setPaintTicks(true);
+		brightness.setPaintLabels(true);
 		
-		b.add(brightValue);
+		b.add(brightness);
 		bPanel.add(b);
 	
 		bPanel.add(Box.createRigidArea(new Dimension(0,5)));
@@ -613,7 +629,15 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		JSlider contrast = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 		
-		contrast.addChangeListener((ChangeListener) this);	//use this event to edit the picture
+		contrast.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});	//use this event to edit the picture
 			//figure out what to do with changelistener
 		
 		contrast.setMajorTickSpacing(10);
@@ -807,7 +831,7 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		
 		//uncomment to run
-		colPanel.add(colorPlate);
+		//colPanel.add(colorPlate);
 		colPanel.add(cp);
 		
 		return colPanel;
