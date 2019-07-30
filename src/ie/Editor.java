@@ -2,17 +2,10 @@ package ie;
 
 import java.awt.*;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,7 +16,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
+
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,42 +30,40 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ie.Brush;
 import ie.CustomUI;
 import ie.Model;
+import ie.NewFileDialog;
 import ie.DrawingAreaPanel;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 
 import javax.swing.JLabel;
-import java.awt.Component;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import java.awt.Graphics;
-import java.awt.GridBagLayout;
-import java.awt.Panel;
 
 public class Editor implements ChangeListener, ActionListener {
 
 	private JFrame frmImageeditor;
 	
 	JPanel colorPlate;
-	
-	CustomUI customUI;
-	
-	int state;
+	JPanel toolboxPanel;
 	
 	final int BRUSH = 0;
 	final int LINE = 1;
 	final int PENCIL = 2;
 	final int ERASER = 3;
+	
+	final int MAX_POINTS = 1048576;
+	private int pointsCount;
+	private Point[] points = new Point[MAX_POINTS];
 	
 	DrawingAreaPanel canvas;
 	
@@ -80,13 +74,32 @@ public class Editor implements ChangeListener, ActionListener {
 	final Color	 BACKGOUND_COLOR = new Color(212, 212, 212);//Color.BLACK;
 	
 	Brush brush		= new Brush();
-	//Brush pencil	= new Brush();
-	//Brush eraser	= new Brush();
+	Brush pencil	= new Brush();
+	Brush eraser	= new Brush();
+	int state;
 	
-	JButton inkColor, canvasColor;
+	JScrollPane scrollPane;
+	JToolBar toolBar;
+	
+	
+	JButton inkColor, canvasColor, bPencil, bBrush, bEraser;
+	NewFileDialog dNewFile;
+	CustomUI customUI;
+	
 	
 	JButton black, white, dGray, gray, lGray, green, blue, cyan,
 	magenta, orange, purple, red, yellow, brown;
+
+	JColorChooser cc;
+	JFileChooser fc;
+
+	// The Menu Items:
+	JMenuItem newFile;
+	JMenuItem openFile; 
+	JMenuItem close;
+	JMenuItem saveFile;
+	JMenuItem saveFileAs;
+	JMenuItem exit;
 
 	public int getState()
 	{
@@ -148,9 +161,12 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
+		int index = tabbedPane.getTabCount() - 1;
+		
 		splitPane.setLeftComponent(tabbedPane);
 		
 		JPanel ci = new JPanel();
+		ci.setToolTipText("add color");
 		ci.setLayout(new GridLayout(1,1));
 		ci.add(Crop());
 		ci.repaint();
@@ -183,6 +199,7 @@ public class Editor implements ChangeListener, ActionListener {
 		blur.repaint();
 		blur.revalidate();
 		tabbedPane.add(blur, "Blur image");
+		
 		
 		JPanel filt = new JPanel();
 		//layout?
@@ -487,8 +504,8 @@ public class Editor implements ChangeListener, ActionListener {
 		JPanel colPanel = new JPanel();
 		colPanel.setLayout(new GridLayout(4,1));
 		
-		JPanel newPanel = new JPanel();
-		JScrollPane pu = new JScrollPane(colPanel);
+		//JPanel newPanel = new JPanel();
+		//JScrollPane pu = new JScrollPane(colPanel);
 		
 		JLabel col = new JLabel("Choose colour...");
 		colPanel.add(col);
@@ -496,6 +513,8 @@ public class Editor implements ChangeListener, ActionListener {
 		setState(BRUSH);
 		
 		canvas	 = new DrawingAreaPanel();
+		cc = new JColorChooser();
+		dNewFile = new NewFileDialog();
 		
 		inkColor = new JButton();//color of the ink being used
 		canvasColor = new JButton();//color of the canvas where the ink is placed
@@ -505,20 +524,35 @@ public class Editor implements ChangeListener, ActionListener {
 		this.updateInkColor(Color.BLACK);
 		brush.setSize(8.0f);
 		
-		//this.updateCanvasColor(Color.WHITE);
+		this.updateCanvasColor(Color.WHITE);
 		//eraser.setSize(16.0f);
 		
 		colorPlate = new JPanel(new GridLayout(7, 2, 2, 2));
 		colorPlate.setBackground(BACKGOUND_COLOR);
-		//colorPlate.setBounds(8, 86, 64, 212);
+		colorPlate.setBounds(8, 86, 64, 212);//adujust to make the color size
 
 		//WILL NEED THIS TOO
 		inkColor.setBackground(brush.getColor());
-		//inkColor.setBounds(8, 18, 64, 64);
+		inkColor.setBounds(8, 18, 64, 64);
 		inkColor.addActionListener(this);
 		Model.setComponentSize(inkColor, 64, 64);
 		
+		
+
+		JPanel colorPanel = new JPanel();
+		colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
+		//colorPanel.setBackground(BACKGOUND_COLOR);
+		colorPanel.add(inkColor);
+		colorPanel.add(colorPlate);		
+		Model.setComponentSize(colorPanel, 80, 120);
 		//inkColor.setUI(customUI);
+		
+		
+		// Create a toolbar and set it to be horizontal:
+		toolBar = new JToolBar(JToolBar.VERTICAL);
+		toolBar.setLayout(new BoxLayout(toolBar, BoxLayout.PAGE_AXIS));
+		toolBar.setFloatable(false);
+
 		
 		black	= colorButton(Color.BLACK);
 		brown	= colorButton(new Color(139,69,19));
@@ -540,33 +574,27 @@ public class Editor implements ChangeListener, ActionListener {
 
 		red		= colorButton(Color.RED);
 		purple	= colorButton(new Color(138,43,226));//Color.PINK);
+		
+		toolBar.add(colorPanel);
+		
+		//canvas.setLayout(new BorderLayout());
+		//canvas.setBounds(0, 0, 102, 76);
 
+		/***fix the panel
+		canvasPanel = new JPanel();
+		canvasPanel.setBackground(BACKGOUND_COLOR);
+		canvasPanel.add(canvas);
+		Model.setComponentSize(canvasPanel, 102, 76);
+		**/
 		
-		JPanel colorPanel = new JPanel();
-		colorPanel.setBorder(new TitledBorder(new EtchedBorder(), "Colors"));
-		colorPanel.setBackground(BACKGOUND_COLOR);
-		colorPanel.add(inkColor);
-		colorPanel.add(colorPlate);		
-		Model.setComponentSize(colorPanel, 80, 304);
+		//JPanel cp = new JPanel();
+		//cp.add(canvasPanel);
+		//colPanel.add(colorPlate);
 		
-		canvas.setLayout(new BorderLayout());
-		//canvas.setBounds(0, 0, 1024, 768);
-
-		//fix the panel
-		//canvasPanel = new JPanel();
-		//canvasPanel.setBackground(BACKGOUND_COLOR);
-		//canvasPanel.add(canvas);
-		//Model.setComponentSize(canvasPanel, 1024, 768);
-		//
+		//colPanel.add(colorPlate);
+		//colPanel.add(canvasPanel);
 		
-		JLabel grad = new JLabel("Gradient...");
-		colPanel.add(grad);
-		colPanel.add(colorPlate);
-		
-		colPanel.add(canvasPanel);
-		newPanel.add(pu);
-		
-		return newPanel;
+		return colPanel;
 	}
 	
 	public JPanel Text() {
@@ -603,10 +631,82 @@ public class Editor implements ChangeListener, ActionListener {
 		
 		return fPanel;
 	}
+	
+	//----------------------------------------------------------
+	
+	public void mousePressed(MouseEvent event)
+	{
+		int x = event.getX();
+		int y = event.getY();
+
+		// indicated which mouse button was pressed
+		if (SwingUtilities.isLeftMouseButton(event))
+		{
+			// Do something
+		} else if (SwingUtilities.isRightMouseButton(event))
+		{
+			// Do something
+		}
+
+		points[pointsCount] = new Point(x, y);
+		if (pointsCount < MAX_POINTS - 1) pointsCount++;
+	}		
+
+	public void mouseReleased(MouseEvent event)
+	{
+		pointsCount = 0;
+		if (state == LINE) canvas.removeLine();
+	}
+	
+	public void mouseDragged(MouseEvent event)
+	{
+
+		int x = event.getX();
+		int y = event.getY();
+
+		if (SwingUtilities.isLeftMouseButton(event))
+		{
+			if (state == BRUSH) 
+			{
+				points[pointsCount] = new Point(x, y);
+				if (pointsCount < MAX_POINTS - 1) {
+					canvas.drawPoint(points, pointsCount, brush);
+					pointsCount++;
+				}
+			}
+			else if (state == LINE)
+			{
+				points[pointsCount] = new Point(x, y);
+				if (pointsCount < MAX_POINTS - 1) {
+					canvas.drawLine(points, pointsCount, brush);
+					pointsCount++;
+				}
+			}
+			else if (state == PENCIL) 
+			{
+				points[pointsCount] = new Point(x, y);
+				if (pointsCount < MAX_POINTS - 1) {
+					canvas.drawPoint(points, pointsCount, pencil);
+					pointsCount++;
+				}
+			}
+			else if (state == ERASER) 
+			{
+				points[pointsCount] = new Point(x, y);
+				if (pointsCount < MAX_POINTS - 1) {
+					canvas.drawPoint(points, pointsCount, eraser);
+					pointsCount++;
+				}
+			}
+		}
+	}
+
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
-	}	
+	}
 }
+	
+	
+
